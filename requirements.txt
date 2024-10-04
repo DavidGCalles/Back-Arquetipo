@@ -1,0 +1,9 @@
+flask
+flask-restful
+flask-swagger-ui
+flask-cors
+mysql-connector-python
+
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

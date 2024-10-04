@@ -1,0 +1,353 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "API documentation for the Flask backend",
+      "version": "1.0.0",
+      "title": "Flask API"
+    },
+    "host": "localhost:5000",
+    "basePath": "/api",
+    "tags": [
+      {
+        "name": "checks",
+        "description": "Ping operations to key subsystems"
+      },
+      {
+        "name": "generic_crud",
+        "description": "Standard demo crud operations"
+      }
+    ],
+    "paths": {
+      "/ping": {
+        "get": {
+          "tags": ["checks"],
+          "summary": "Ping the server",
+          "description": "Returns a pong response",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "pong"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/test_db": {
+        "get": {
+          "tags": ["checks"],
+          "summary": "Test database connection",
+          "description": "Tests the connection to the database and returns a status message.",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Connection successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Database Correctly Connected"
+                  }
+                }
+              }
+            },
+            "503": {
+              "description": "Failed to connect to the database",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Database Not Connected"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/crud": {
+        "get": {
+          "tags": ["generic_crud"],
+          "summary": "Get all users",
+          "description": "Retrieves all user data from the users table",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Successful retrieval of data",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "No data found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        },
+        "post": {
+          "tags": ["generic_crud"],
+          "summary": "Insert a new user record",
+          "description": "Inserts a new record into the users table. Includes user details such as user ID, date, transaction total, and optional comments, eye color, and a life text.",
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "user",
+              "description": "User record data",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "example": "user1234"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2024-09-23"
+                  },
+                  "total": {
+                    "type": "number",
+                    "format": "decimal",
+                    "example": 199.99
+                  },
+                  "comments": {
+                    "type": "string",
+                    "example": "This is a sample comment about the transaction."
+                  },
+                  "eyes": {
+                    "type": "string",
+                    "example": "blue"
+                  },
+                  "lifetext": {
+                    "type": "string",
+                    "example": "This is a long text describing the user's life, background, or other detailed information."
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "User record inserted successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "User record added successfully"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid user data provided"
+            },
+            "503": {
+              "description": "Service unavailable"
+            }
+          }
+        },
+        "patch": {
+          "tags": ["generic_crud"],
+          "summary": "Update an existing user record",
+          "description": "Updates an existing record in the users table based on the user ID provided.",
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "user",
+              "description": "Updated user record data",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "required": true,
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "jane.doe@example.com"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User record updated successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid user data or no ID provided"
+            },
+            "503": {
+              "description": "Service unavailable"
+            }
+          }
+        },
+        "delete": {
+          "tags": ["generic_crud"],
+          "summary": "Delete an existing user record",
+          "description": "Deletes an existing user record from the users table based on the user ID provided.",
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "user",
+              "description": "Identifier for the user to be deleted",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "required": true,
+                    "example": 1
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User record deleted successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "User record deleted successfully"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid user data or no ID provided",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Invalid ID provided or record cannot be found"
+                  }
+                }
+              }
+            },
+            "503": {
+              "description": "Service unavailable",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Database service is unavailable"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/login": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Initiate OAuth2 login",
+        "description": "Redirects to Google's OAuth 2.0 server for user authentication and authorization.",
+        "produces": ["application/json"],
+        "responses": {
+          "302": {
+            "description": "Redirect to Google's authorization page"
+          }
+        }
+      }
+      },
+      "/login/google_callback": {
+        "get": {
+          "tags": ["auth"],
+          "summary": "Google OAuth2 callback endpoint",
+          "description": "Handles the response from Google after user authorization, exchanging the authorization code for an access token.",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Authentication successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Authentication completed successfully."
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request, failed to exchange token",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Failed to retrieve access token"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+
+  
