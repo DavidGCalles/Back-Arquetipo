@@ -17,6 +17,10 @@ https://back-arquetipo-856517455627.europe-southwest1.run.app/swagger
 
 It lacks DB connection because we dont know if its advisable to spin a db container in this kind of setup.
 
+# How to deploy with docker
+1. docker run -d -p 5000:5000 your-image-name
+2. http://localhost:5000/swagger
+
 # How to deploy to Cloud Run
 1. Check if the container builds and runs locally.
 2. Go to: https://console.cloud.google.com/run
