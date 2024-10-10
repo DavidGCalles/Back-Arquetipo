@@ -9,6 +9,14 @@ class Config:
         'title': 'Flask API',
         'uiversion': 3
     }
+    DB_TYPE = "MySql"
+    DB_MYSQL_LOGIN = {
+        "DB_HOST": 'db',
+        "DB_PORT": '3306',
+        "DB_NAME": 'your_database_name',
+        "DB_USER": 'root',
+        "DB_PASSWORD": 'toor'
+    }
     DB_HOST = 'db'
     DB_PORT = '3306'
     DB_NAME = 'your_database_name'
