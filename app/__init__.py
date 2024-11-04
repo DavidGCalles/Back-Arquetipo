@@ -4,7 +4,9 @@ from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__, static_folder="static")
-    CORS(app, expose_headers=['Content-Type'], supports_credentials=True)
+    CORS(app, origins=["https://front-arquetipo-856517455627.europe-southwest1.run.app"],
+         expose_headers=['Content-Type'],
+         supports_credentials=True)
     
     # Register Blueprints
     from app.routes.main import main_bp
