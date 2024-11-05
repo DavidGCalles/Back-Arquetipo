@@ -6,7 +6,7 @@ steps:
       - '-c'
       - |
         echo "Downloading secrets_file.py from Cloud Storage..."
-        gsutil cp gs://$_CONFIG_BUCKET/secrets_file.py ./secrets_file.py
+        gsutil cp gs://$_CONFIG_BUCKET/secrets_file.py ./app/secrets_file.py
 
   # Docker build step
   - name: gcr.io/cloud-builders/docker
