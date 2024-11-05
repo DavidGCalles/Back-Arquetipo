@@ -1,0 +1,71 @@
+steps:
+  # Step to download the config.json from Cloud Storage
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Downloading secrets_file.py from Cloud Storage..."
+        gsutil cp gs://$_CONFIG_BUCKET/secrets_file.py ./secrets_file.py
+
+  # Docker build step
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+
+  # Docker push step
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+
+  # Deploy to Cloud Run step
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+      -  >-
+        --set-env-vars=_SERVICE_NAME=$_SERVICE_NAME,REPO_NAME=$REPO_NAME,_DEPLOY_REGION=$_DEPLOY_REGION,_AR_HOSTNAME=$_AR_HOSTNAME,_CONFIG_BUCKET=$_CONFIG_BUCKET,PROJECT_ID=$PROJECT_ID
+    id: Deploy
+    entrypoint: gcloud
+
+images:
+  - >-
+    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _PLATFORM: managed
+  _SERVICE_NAME: back-arquetipo
+  REPO_NAME: back-arquetipo
+  _TRIGGER_ID: fa85794a-2461-4a6b-b3db-8cac5bfa5fed
+  _DEPLOY_REGION: europe-southwest1
+  _AR_HOSTNAME: europe-southwest1-docker.pkg.dev
+  _CONFIG_BUCKET: archetype-configs
+
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - back-arquetipo
