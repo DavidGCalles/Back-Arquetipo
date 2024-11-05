@@ -2,10 +2,12 @@ steps:
   # Step to download the config.json from Cloud Storage
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
-  - |
-      echo "Downloading secrets_file.py from Cloud Storage..."
-      mkdir -p /workspace/app
-      gsutil cp gs://$_CONFIG_BUCKET/secrets_file.py /workspace/app/secrets_file.py
+    args:
+      - '-c'
+      - |
+        echo "Downloading secrets_file.py from Cloud Storage..."
+        mkdir -p /workspace/app
+        gsutil cp gs://$_CONFIG_BUCKET/secrets_file.py /workspace/app/secrets_file.py
 
   # Docker build step
   - name: gcr.io/cloud-builders/docker
