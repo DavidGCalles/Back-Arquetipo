@@ -3,3 +3,4 @@
 /app/dao/__pycache__
 /app/routes/__pycache__
 /app/services/__pycache__
+secrets_file.py
