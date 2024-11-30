@@ -5,7 +5,7 @@
       "version": "1.0.0",
       "title": "Flask API"
     },
-    "host": "back-arquetipo-856517455627.europe-southwest1.run.app",
+    "host": "",
     "basePath": "/api",
     "tags": [
       {

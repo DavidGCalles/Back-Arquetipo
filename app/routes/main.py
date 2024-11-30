@@ -1,6 +1,8 @@
 """Main Blueprint, made for checking services"""
 from flask import Blueprint, jsonify#, request
 from app.services.db import get_db_connection
+import json
+import os
 
 main_bp = Blueprint('main', __name__)
 
@@ -50,3 +52,11 @@ def test_db():
         return jsonify({"message": "Database Correctly Connected"}),200
     else:
         return jsonify({"message": "Database Not Connected"}),503
+
+@main_bp.route('/swagger.json')
+def swagger():
+    with open('app/static/swagger.json') as f:
+        swagger_data = json.load(f)
+    # Dynamically set the host
+    swagger_data["host"] = os.getenv("SWAGGER_HOST", "localhost:5000")
+    return jsonify(swagger_data)

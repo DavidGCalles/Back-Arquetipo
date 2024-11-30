@@ -20,4 +20,6 @@ Followed by:
 
     docker-compose up -d
 
+## List of ENV variables used in the app
+1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work
 
