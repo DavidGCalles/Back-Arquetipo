@@ -10,16 +10,23 @@ This software was made to learn about good practices and how to create boilerpla
 
     git clone https://github.com/DavidGCalles/Back-Arquetipo
 
-## INSTALL
-Then go to your prefered terminal and execute:
-
-    pip install -f requirements.txt
-
 ## RUN
 Followed by:
 
     docker-compose up -d
 
+# How it works
+It deploy 2 containers, one for the backend, other for the test db. You can test de db connection in:
+
+   http://localhost:5000/swagger
+
+## Demo use
+NOT DEVELOPED. Story AR-28. It needs a script to setup couple of tables of the db and populate them with mock data.
+
+# Unordered sections
+
 ## List of ENV variables used in the app
 1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work
+
+    1.1. This variable is used inside app/routes/main.py in the endpoint @main_bp.route('/swagger.json'). This will select the correct host depending on the deployment type.
 
