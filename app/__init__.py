@@ -1,6 +1,8 @@
-from flask import Flask, jsonify
-from flask_smorest import Api, Blueprint
+from flask import Flask
+from flask_smorest import Api
 from flask_cors import CORS
+from app.routes.main import main_bp
+from app.routes.crud import crud_bp
 
 def create_app():
     app = Flask(__name__)
@@ -17,33 +19,6 @@ def create_app():
          supports_credentials=True)
     api = Api(app)
 
-    # Create a blueprint for your API
-    blp = Blueprint("example", "example", url_prefix="/api", description="Example operations")
-
-    @blp.route("/hello")
-    @blp.doc(description="Returns a simple hello message.")
-    def hello():
-        """Returns a hello world message."""
-        return jsonify({"message": "Hello, world!"})
-
-    @blp.route("/add")
-    @blp.doc(description="Adds two numbers.")
-    @blp.arguments(
-        {
-            "type": "object",
-            "properties": {
-                "a": {"type": "number", "description": "The first number."},
-                "b": {"type": "number", "description": "The second number."},
-            },
-            "required": ["a", "b"],
-        },
-        location="json",
-    )
-    @blp.response(200, {"result": {"type": "number"}}, description="The sum of the two numbers.")
-    def add_numbers(data):
-        """Adds two numbers and returns the result."""
-        return jsonify({"result": data["a"] + data["b"]})
-
-    # Register the blueprint
-    api.register_blueprint(blp)
+    api.register_blueprint(main_bp)
+    api.register_blueprint(crud_bp)
     return app
