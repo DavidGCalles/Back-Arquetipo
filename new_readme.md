@@ -16,11 +16,20 @@ Followed by:
     docker-compose up -d
 
 # How it works
+
+## Standalone
+NOT DEVELOPED. Story AR-31. You can run:
+
+    run.py
+
+And it will work the same as if you run it from docker, without its niceties. It will run on the development server of Flask and write to a sqlite database that will be erased when finishing the program.
+
+## Docker
 It deploy 2 containers, one for the backend, other for the test db. You can test de db connection in:
 
    http://localhost:5000/swagger
 
-## Demo use
+# Demo use
 NOT DEVELOPED. Story AR-28. It needs a script to setup couple of tables of the db and populate them with mock data.
 
 # Unordered sections

@@ -3,6 +3,7 @@ from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
 from app.routes.crud import crud_bp
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +15,8 @@ def create_app():
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    if os.getenv("SWAGGER_HOST"):
+        app.config['SWAGGER_UI_HOST'] = os.getenv("SWAGGER_UI_HOST")
     CORS(app, origins=["https://front-arquetipo-856517455627.europe-southwest1.run.app"],
          expose_headers=['Content-Type'], 
          supports_credentials=True)
