@@ -5,4 +5,4 @@
 /app/services/__pycache__
 /app/models/__pycache__
 secrets_file.py
-inmemory.db
+inmemory.db*
