@@ -2,7 +2,7 @@ from flask import Flask
 from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
-from app.routes.crud import crud_bp
+from app.routes.demo_crud import crud_bp
 import os
 
 def create_app():
