@@ -35,7 +35,7 @@ NOT DEVELOPED. Story AR-28. It needs a script to setup couple of tables of the d
 # Unordered sections
 
 ## List of ENV variables used in the app
-1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work
+1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work. This variable is used inside app/_ _ init _ _.py. This will select the correct host depending on the deployment type.
 
-    1.1. This variable is used inside app/_ _ init _ _.py. This will select the correct host depending on the deployment type.
+2. DATABASE_TYPE: This variable determines what set of variables your instance will get to connect to the database. It defaults to "sqlite"
 

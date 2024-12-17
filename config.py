@@ -9,19 +9,18 @@ class Config:
         'title': 'Flask API',
         'uiversion': 3
     }
-    DB_TYPE = "MySql"
-    DB_MYSQL_LOGIN = {
-        "DB_HOST": 'db',
-        "DB_PORT": '3306',
-        "DB_NAME": 'your_database_name',
-        "DB_USER": 'root',
-        "DB_PASSWORD": 'toor'
+    DB_TYPES = {
+        "sqlite": {
+            "DB_HOST" : "inmemory.db"
+        },
+        "mysql": {
+            "DB_HOST": 'db',
+            "DB_PORT": '3306',
+            "DB_NAME": 'your_database_name',
+            "DB_USER": 'root',
+            "DB_PASSWORD": 'toor'
+        }
     }
-    DB_HOST = 'db'
-    DB_PORT = '3306'
-    DB_NAME = 'your_database_name'
-    DB_USER = 'root'
-    DB_PASSWORD = 'toor'
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,
