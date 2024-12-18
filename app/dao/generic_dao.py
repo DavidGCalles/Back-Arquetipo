@@ -1,5 +1,5 @@
 """This DAO represents the minimum entity to be used as DAO. Can be used as base class or totally rewritten."""
-from app.services.db import get_db_connection
+from app.services.db import DBManager
 
 class BaseDAO:
     """
@@ -13,7 +13,7 @@ class BaseDAO:
         """
         Initializes the BaseDAO with a specific table name and database connection.
         """
-        self.table = "users"
+        self.table = "item"
         self.connection = None
     def generic_get_all(self):
         """
@@ -22,7 +22,7 @@ class BaseDAO:
         Returns:
             list: A list of tuples representing each record fetched from the table.
         """
-        self.connection = get_db_connection()
+        self.connection = DBManager().get_db_connection()
         query = f"SELECT * FROM {self.table}"
         cursor = self.connection.cursor()
         cursor.execute(query)
