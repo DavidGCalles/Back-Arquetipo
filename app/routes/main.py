@@ -1,7 +1,8 @@
 """Main Blueprint, made for checking services"""
 from flask import jsonify
 from flask_smorest import Blueprint
-from app.services.db import get_db_connection
+from app.services.db import DBManager
+from config import LOGGER
 
 main_bp = Blueprint('checks', __name__)
 
@@ -11,7 +12,7 @@ def ping():
     """
     Makes a ping request to the server to test basic connectivity.
     """
-    print("This is a ping")
+    LOGGER.warning("This is a ping")
     return jsonify({"message": "pong"})
 
 
@@ -22,7 +23,7 @@ def test_db():
     """
     Tests the database connection and returns the status.
     """
-    conn = get_db_connection()
+    conn = DBManager().get_db_connection()
     if conn is not None:
         return jsonify({"message": "Database Correctly Connected"}), 200
     else:

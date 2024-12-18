@@ -21,6 +21,7 @@ class Config:
             "DB_PASSWORD": 'toor'
         }
     }
+    DDL_NAME = "models/ddl.sql"
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,
