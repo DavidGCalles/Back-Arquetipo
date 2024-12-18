@@ -6,14 +6,12 @@ import sqlite3
 import mysql.connector
 from mysql.connector import Error
 from config import Config, LOGGER
-from os import getcwd
 
 class DBManager:
     def __init__(self):
         self.db_type = os.getenv("DATABASE_TYPE", "sqlite")
         self.db_settings = Config.DB_TYPES[self.db_type]
         self.project_root = Path(__file__).resolve().parent.parent
-        LOGGER.error("Project root: %s", self.project_root)
     def check_coherence(self):
         LOGGER.info("Chequeando la coherencia de la base de datos %s", self.db_type)
         if self.db_type == "sqlite":
@@ -22,7 +20,6 @@ class DBManager:
                 cur = conn.cursor()
                 ddl_path = self.project_root / Config.DDL_NAME
                 LOGGER.info("Cargando ddl")
-                LOGGER.error(getcwd())
                 with open(ddl_path, 'r', encoding="UTF-8") as file:
                     sql_script = file.read()
                 cur.executescript(sql_script)
