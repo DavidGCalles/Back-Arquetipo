@@ -1,19 +1,19 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint
-from flask import jsonify
+from flask import jsonify, request
 from app.dao.generic_dao import BaseDAO
-from app.models.demo_schemas import ItemSchema, UpdateItemSchema, SuccessResponseSchema, MessageResponseSchema
+from app.models.demo_schemas import ItemSchema, UpdateItemSchema, SuccessResponseSchema, MessageResponseSchema, SearchItemSchema
 
 # Blueprint
-crud_bp = Blueprint('crud', __name__, description="Generic CRUD operations for items.")
+crud_bp = Blueprint('crud', __name__, description="CRUD operations for items.")
 
 # DAO
 crud_dao = BaseDAO()
 
-# Class-Based View
+# Operations for the collection (/demo_crud)
 @crud_bp.route('/demo_crud')
-class GenericCRUD(MethodView):
-    @crud_bp.response(200, ItemSchema(many=True), description="Data is successfully retrieved.")
+class ItemCollection(MethodView):
+    @crud_bp.response(200, ItemSchema(many=True), description="Data successfully retrieved.")
     @crud_bp.doc(summary="Retrieve all items", description="Fetch all items from the database.")
     def get(self):
         """
@@ -28,38 +28,88 @@ class GenericCRUD(MethodView):
     @crud_bp.doc(summary="Insert new item", description="Insert a new item into the database.")
     def post(self, new_data):
         """
-        POST method: Insert new item.
+        POST method: Insert a new item.
         """
         result = crud_dao.generic_insert(new_data)
         if result:
             return {"message": "New item inserted"}, 201
         return {"message": "There was a problem inserting the item"}, 503
 
-    @crud_bp.arguments(UpdateItemSchema)
-    @crud_bp.response(200, SuccessResponseSchema, description="Item successfully updated.")
-    @crud_bp.response(400, SuccessResponseSchema, description="Error updating the item.")
-    @crud_bp.doc(summary="Update an item", description="Update an existing item using its ID.")
-    def patch(self, update_data):
+# Operations for a single resource (/demo_crud/item/<id>)
+@crud_bp.route('/demo_crud/item/<int:item_id>')
+class ItemResource(MethodView):
+    @crud_bp.response(200, ItemSchema, description="Item successfully retrieved.")
+    @crud_bp.response(404, MessageResponseSchema, description="Item not found.")
+    @crud_bp.doc(summary="Retrieve an item", description="Fetch an item by its ID.")
+    def get(self, item_id):
         """
-        PATCH method: Update existing item.
+        GET method: Retrieve an item by ID.
         """
-        item_id = update_data.pop("id", None)
-        if not item_id:
-            return {"success": False}, 400
-        result = crud_dao.generic_update("id", update_data)
-        if result:
-            return {"success": True}, 200
-        return {"success": False}, 400
+        item = crud_dao.generic_get_by_field("id", item_id)
+        if item:
+            return jsonify(item), 200
+        return {"message": "Item not found"}, 404
 
     @crud_bp.arguments(UpdateItemSchema)
+    @crud_bp.response(200, SuccessResponseSchema, description="Item successfully updated.")
+    @crud_bp.response(404, MessageResponseSchema, description="Item not found.")
+    @crud_bp.doc(summary="Update an item", description="Update an existing item by its ID.")
+    def patch(self, update_data, item_id):
+        """
+        PATCH method: Update an item by ID.
+        """
+        result = crud_dao.generic_update("id", {"id": item_id, **update_data})
+        if result:
+            return {"success": True}, 200
+        return {"message": "Item not found"}, 404
+
+    @crud_bp.arguments(ItemSchema)
+    @crud_bp.response(200, SuccessResponseSchema, description="Item successfully replaced.")
+    @crud_bp.response(404, MessageResponseSchema, description="Item not found.")
+    @crud_bp.doc(summary="Replace an item", description="Completely replace an item by its ID.")
+    def put(self, new_data, item_id):
+        """
+        PUT method: Replace an item by ID.
+        """
+        result = crud_dao.generic_replace("id", {"id": item_id, **new_data})
+        if result:
+            return {"success": True}, 200
+        return {"message": "Item not found"}, 404
+
     @crud_bp.response(200, MessageResponseSchema, description="Item successfully deleted.")
-    @crud_bp.response(503, MessageResponseSchema, description="Error deleting the item.")
+    @crud_bp.response(404, MessageResponseSchema, description="Item not found.")
     @crud_bp.doc(summary="Delete an item", description="Delete an item by its ID.")
-    def delete(self, delete_data):
+    def delete(self, item_id):
         """
-        DELETE method: Delete item by ID.
+        DELETE method: Delete an item by ID.
         """
-        item_id = delete_data.get("id")
         if crud_dao.generic_delete("id", item_id):
             return {"message": "Record deleted successfully"}, 200
-        return {"message": "Record cannot be deleted"}, 503
+        return {"message": "Item not found or cannot be deleted"}, 404
+    
+@crud_bp.route('/demo_crud/search')
+class ItemSearch(MethodView):
+    @crud_bp.response(200, ItemSchema(many=True), description="Items successfully retrieved.")
+    @crud_bp.response(400, MessageResponseSchema, description="Invalid search parameters.")
+    @crud_bp.arguments(SearchItemSchema, location="query")
+    @crud_bp.doc(
+        summary="Search items", 
+        description="Search for items based on query parameters. Query parameters can include 'name', 'category', 'price_min', and 'price_max'."
+    )
+    def get(self, args):
+        """
+        GET method: Search items based on query parameters.
+
+        Query parameters:
+        - name: Name of the item to search for (optional)
+        - category: Category of the item (optional)
+        - price_min: Minimum price of the item (optional)
+        - price_max: Maximum price of the item (optional)
+        """
+        query_params = {key: value for key, value in args.items() if value is not None}
+
+        if not query_params:
+            return {"message": "No search parameters provided"}, 400
+
+        results = crud_dao.generic_search(query_params)
+        return jsonify(results), 200

@@ -29,7 +29,7 @@ class BaseDAO:
         data = cursor.fetchall()
         return data
 
-    def generic_insert(self, insert_data:dict):
+    def generic_insert(self, insert_data: dict):
         """
         Inserts a new record into the database table.
 
@@ -39,10 +39,13 @@ class BaseDAO:
         Returns:
             int: The auto-generated ID of the newly inserted record.
         """
-            # Extract keys and values from insert_data
-        self.connection = get_db_connection()
+        # Determine the placeholder style based on the global DBTYPE
+        placeholder = "?" if DBManager().db_type == "sqlite" else "%s"
+
+        # Extract keys and values from insert_data
+        self.connection = DBManager().get_db_connection()
         keys = ", ".join(insert_data.keys())
-        placeholders = ", ".join(["%s"] * len(insert_data))  # Use placeholders for security
+        placeholders = ", ".join([placeholder] * len(insert_data))  # Use the appropriate placeholder
 
         # Construct the SQL query with placeholders
         query = f"INSERT INTO {self.table} ({keys}) VALUES ({placeholders});"
@@ -78,7 +81,7 @@ class BaseDAO:
         Raises:
         - KeyError: If the primary key is not found in the update_data dictionary.
         - psycopg2.DatabaseError: If an error occurs during database operation."""
-        self.connection = get_db_connection()
+        self.connection = DBManager().get_db_connection()
         primary_key = update_data.pop(pk)
         keys = ", ".join([f"{key} = %s" for key in update_data.keys()])
         values = list(update_data.values())
@@ -115,7 +118,7 @@ class BaseDAO:
         Raises:
         - Exception: If the SQL execution fails or if there are issues with the database connection.
         """
-        self.connection = get_db_connection()
+        self.connection = DBManager().get_db_connection()
         query = f"DELETE FROM {self.table} WHERE {pk} = {id_to_delete}"
         cursor = self.connection.cursor()
         cursor.execute(query)
