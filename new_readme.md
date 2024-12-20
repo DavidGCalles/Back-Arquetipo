@@ -39,3 +39,18 @@ NOT DEVELOPED. Story AR-28. It needs a script to setup couple of tables of the d
 
 2. DATABASE_TYPE: This variable determines what set of variables your instance will get to connect to the database. It defaults to "sqlite"
 
+## Testing
+Execute this commands in the root folder.
+If you have problems with importing modules, try:
+
+    export PYTHONPATH=<absolute-path to folder>
+    set PYTHONPATH=<absolute-path to folder>
+
+To run the tests:
+
+    pytest
+
+If you want to generate lcov files:
+
+    pytest --cov=. --cov-report=lcov
+
