@@ -3,6 +3,7 @@ from flask_smorest import Blueprint
 from flask import jsonify, request
 from app.dao.generic_dao import BaseDAO
 from app.models.demo_schemas import ItemSchema, UpdateItemSchema, SuccessResponseSchema, MessageResponseSchema, SearchItemSchema
+from config import LOGGER
 
 # Blueprint
 crud_bp = Blueprint('crud', __name__, description="CRUD operations for items.")
@@ -71,8 +72,9 @@ class ItemResource(MethodView):
         """
         PUT method: Replace an item by ID.
         """
-        result = crud_dao.generic_replace("id", {"id": item_id, **new_data})
-        if result:
+        LOGGER.info(f"Replacing item with ID: {item_id}")
+        result = crud_dao.generic_replace({"id": item_id, **new_data})
+        if result: 
             return {"success": True}, 200
         return {"message": "Item not found"}, 404
 
@@ -111,5 +113,5 @@ class ItemSearch(MethodView):
         if not query_params:
             return {"message": "No search parameters provided"}, 400
 
-        results = crud_dao.generic_search(query_params)
+        results = crud_dao.generic_search(query_params, True)
         return jsonify(results), 200
