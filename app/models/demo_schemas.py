@@ -10,6 +10,11 @@ class UpdateItemSchema(Schema):
     name = fields.Str(required=False, description="Updated name")
     description = fields.Str(required=False, description="Updated description")
 
+class SearchItemSchema(Schema):
+    name = fields.Str(required=False)
+    id = fields.Int(required=False)
+    description = fields.Str(required=False, description="Updated description")
+
 class SuccessResponseSchema(Schema):
     success = fields.Bool(description="Indicates whether the operation was successful")
 
