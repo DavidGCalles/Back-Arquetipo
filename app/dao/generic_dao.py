@@ -1,5 +1,6 @@
 """This DAO represents the minimum entity to be used as DAO. Can be used as base class or totally rewritten."""
-from app.services.db import get_db_connection
+from app.services.db import DBManager
+from config import LOGGER
 
 class BaseDAO:
     """
@@ -13,7 +14,8 @@ class BaseDAO:
         """
         Initializes the BaseDAO with a specific table name and database connection.
         """
-        self.table = "users"
+        self.table = "item"
+        self.placeholder = "?" if DBManager().db_type == "sqlite" else "%s"
         self.connection = None
     def generic_get_all(self):
         """
@@ -22,14 +24,76 @@ class BaseDAO:
         Returns:
             list: A list of tuples representing each record fetched from the table.
         """
-        self.connection = get_db_connection()
+        self.connection = DBManager().get_db_connection()
         query = f"SELECT * FROM {self.table}"
         cursor = self.connection.cursor()
         cursor.execute(query)
         data = cursor.fetchall()
         return data
+    
+    def generic_get_by_field(self, field:str, value:str|int, like:bool=False):
+        """
+        Fetches a record from the database based on a specific field value.
+        It has the option to use a LIKE clause for partial matching.
+        
+        Parameters:
+        - field (str): The field to search for in the database table.
+        - value (str|int): The value to match in the specified field.
+        - like (bool): Whether to use a LIKE clause for partial matching (default is False).
+        
+        Returns:
+        - tuple: A tuple representing the record fetched from the table.
+        """
+        self.connection = DBManager().get_db_connection()
+        operator = "LIKE" if like else "="
+        query = f"SELECT * FROM {self.table} WHERE {field} {operator} {self.placeholder}"
+        cursor = self.connection.cursor()
+        cursor.execute(query, (value,))
+        data = cursor.fetchone()
+        return data
 
-    def generic_insert(self, insert_data:dict):
+    def generic_search(self, search_data: dict, like: bool = False):
+        """
+        Searches for records in the database based on the search_data dictionary.
+        It has the option to use a LIKE clause for partial matching.
+
+        Parameters:
+        - search_data (dict): A dictionary containing the fields to search for and their values.
+        - like (bool): Whether to use a LIKE clause for partial matching (default is False).
+
+        Returns:
+        - list: A list of tuples representing the records fetched from the table.
+        """
+        self.connection = DBManager().get_db_connection()
+        
+        # Build the conditions for the query
+        conditions = []
+        for key, value in search_data.items():
+            if like and ('name' in key or 'description' in key):
+                # For 'name' or 'description', use LIKE with '%' around the value
+                conditions.append(f"{key} LIKE {self.placeholder}")
+                search_data[key] = f"%{value}%"  # Add '%' around the value for LIKE
+            else:
+                # For other fields, use '='
+                conditions.append(f"{key} = {self.placeholder}")
+        
+        # Join the conditions with 'AND'
+        conditions_str = " AND ".join(conditions)
+        
+        # Build the full query
+        query = f"SELECT * FROM {self.table} WHERE {conditions_str}"
+        
+        LOGGER.debug(query)  # Log the query for debugging
+        
+        # Execute the query
+        cursor = self.connection.cursor()
+        cursor.execute(query, tuple(search_data.values()))  # Pass the updated search_data
+        data = cursor.fetchall()
+        
+        return data
+
+
+    def generic_insert(self, insert_data: dict):
         """
         Inserts a new record into the database table.
 
@@ -39,10 +103,11 @@ class BaseDAO:
         Returns:
             int: The auto-generated ID of the newly inserted record.
         """
-            # Extract keys and values from insert_data
-        self.connection = get_db_connection()
+
+        # Extract keys and values from insert_data
+        self.connection = DBManager().get_db_connection()
         keys = ", ".join(insert_data.keys())
-        placeholders = ", ".join(["%s"] * len(insert_data))  # Use placeholders for security
+        placeholders = ", ".join([self.placeholder] * len(insert_data))  # Use the appropriate placeholder
 
         # Construct the SQL query with placeholders
         query = f"INSERT INTO {self.table} ({keys}) VALUES ({placeholders});"
@@ -76,21 +141,49 @@ class BaseDAO:
         - int: The number of rows affected by the update operation.
 
         Raises:
-        - KeyError: If the primary key is not found in the update_data dictionary.
-        - psycopg2.DatabaseError: If an error occurs during database operation."""
-        self.connection = get_db_connection()
+        - KeyError: If the primary key is not found in the update_data dictionary."""
+        self.connection = DBManager().get_db_connection()
         primary_key = update_data.pop(pk)
-        keys = ", ".join([f"{key} = %s" for key in update_data.keys()])
+        keys = ", ".join([f"{key} = {self.placeholder}" for key in update_data.keys()])
         values = list(update_data.values())
         values.append(primary_key)  # Append the primary key to values to use in the WHERE clause
-        sql = f"UPDATE {self.table} SET {keys} WHERE {pk} = %s"
-
-        # Execute the SQL command
-        with self.connection.cursor() as cursor:
-            cursor.execute(sql, values)
-            self.connection.commit()  # Commit the changes
+        sql = f"UPDATE {self.table} SET {keys} WHERE {pk} = {self.placeholder}"
+        LOGGER.debug(sql)
+        cursor = self.connection.cursor()
+        cursor.execute(sql, values)
+        self.connection.commit()
 
         return cursor.rowcount  # Return the number of rows affected
+
+    def generic_replace(self, replace_data:dict):
+        """
+        Replaces a record in the database with new data provided in the replace_data dictionary.
+
+        This method constructs and executes an SQL REPLACE statement to replace a record in the database
+        with new data. It identifies the record to replace using the primary key provided and replaces
+        all fields with the new values provided.
+
+        Parameters:
+        - pk (str): The key in the replace_data dictionary that holds the primary key of the record.
+        - replace_data (dict): A dictionary containing the fields to replace with their new values. 
+                            The dictionary must contain the primary key as one of its keys.
+
+        Returns:
+        - int: The number of rows affected by the replace operation.
+
+        Raises:
+        - KeyError: If the primary key is not found in the replace_data dictionary.
+        """
+        self.connection = DBManager().get_db_connection()
+        keys = ", ".join(replace_data.keys())
+        placeholders = ", ".join([self.placeholder] * len(replace_data.keys()))
+        values = list(replace_data.values())
+        sql = f"REPLACE INTO {self.table} ({keys}) VALUES ({placeholders})"
+        LOGGER.debug(sql)
+        cursor = self.connection.cursor()
+        cursor.execute(sql, values)
+        self.connection.commit()
+        return cursor.rowcount
 
     def generic_delete(self, pk:str, id_to_delete:str|int):
         """
@@ -115,7 +208,7 @@ class BaseDAO:
         Raises:
         - Exception: If the SQL execution fails or if there are issues with the database connection.
         """
-        self.connection = get_db_connection()
+        self.connection = DBManager().get_db_connection()
         query = f"DELETE FROM {self.table} WHERE {pk} = {id_to_delete}"
         cursor = self.connection.cursor()
         cursor.execute(query)

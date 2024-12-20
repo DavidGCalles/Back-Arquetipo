@@ -3,4 +3,10 @@
 /app/dao/__pycache__
 /app/routes/__pycache__
 /app/services/__pycache__
+/app/models/__pycache__
+/app/tests/__pycache__
 secrets_file.py
+inmemory.db*
+.coverage
+coverage.lcov
+.vscode/

@@ -9,22 +9,22 @@ class Config:
         'title': 'Flask API',
         'uiversion': 3
     }
-    DB_TYPE = "MySql"
-    DB_MYSQL_LOGIN = {
-        "DB_HOST": 'db',
-        "DB_PORT": '3306',
-        "DB_NAME": 'your_database_name',
-        "DB_USER": 'root',
-        "DB_PASSWORD": 'toor'
+    DB_TYPES = {
+        "sqlite": {
+            "DB_HOST" : "inmemory.db"
+        },
+        "mysql": {
+            "DB_HOST": 'db',
+            "DB_PORT": '3306',
+            "DB_NAME": 'your_database_name',
+            "DB_USER": 'root',
+            "DB_PASSWORD": 'toor'
+        }
     }
-    DB_HOST = 'db'
-    DB_PORT = '3306'
-    DB_NAME = 'your_database_name'
-    DB_USER = 'root'
-    DB_PASSWORD = 'toor'
+    DDL_NAME = "models/ddl.sql"
     GOOGLE_OAUTH = {
-        "GOOGLE_CLIENT_ID" : ""#GOOGLE_CLIENT_ID,
-        "GOOGLE_CLIENT_SECRET" :""# GOOGLE_CLIENT_SECRET,
+        "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
+        "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,
         "REDIRECT_URI" : 'http://localhost:5000/api/login/google_callback', ## Deberia estar parametrizado para no liarla en caso de otra configuracion
         "AUTH_URI" : 'https://accounts.google.com/o/oauth2/auth',
         "TOKEN_URI" : 'https://accounts.google.com/o/oauth2/token',
