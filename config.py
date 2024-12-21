@@ -13,7 +13,7 @@ class Config:
         "sqlite": {
             "DB_HOST" : "inmemory.db"
         },
-        "mysql": {
+        "mysql-docker": {
             "DB_HOST": 'db',
             "DB_PORT": '3306',
             "DB_NAME": 'your_database_name',

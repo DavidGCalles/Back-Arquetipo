@@ -8,11 +8,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=yourpassword
-      - DB_NAME=testdb
+      - DATABASE_TYPE=mysql-docker
     depends_on:
       - db
 
