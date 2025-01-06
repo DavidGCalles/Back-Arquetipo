@@ -30,6 +30,23 @@ class DBManager:
             except Exception as e:
                 LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
                 return False
+        elif self.db_type in ["mysql", "mysql-docker"]:
+            try:
+                conn = self.get_db_connection()
+                cur = conn.cursor()
+                ddl_path = self.project_root / Config.MYSQL_DDL_NAME
+                LOGGER.info("Cargando ddl")
+                with open(ddl_path, 'r', encoding="UTF-8") as file:
+                    sql_script = file.read()
+                for result in cur.execute(sql_script, multi=True):
+                    pass
+                conn.commit()
+                conn.close()
+                LOGGER.info("Comprobación terminada")
+                return True
+            except Exception as e:
+                LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
+                return False
             
     def get_db_connection(self):
         """Creates and return a db connection with the parameters given in config class"""
@@ -40,7 +57,7 @@ class DBManager:
             except Error as e:
                 LOGGER.error("Error connecting to SQLite3: %s",e)
                 return None
-        elif self.db_type == "mysql":
+        elif self.db_type in ["mysql","mysql-docker"]:
             try:
                 connection = mysql.connector.connect(
                     host=self.db_settings["DB_HOST"],
