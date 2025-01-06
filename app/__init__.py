@@ -3,6 +3,7 @@ from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
 from app.routes.demo_crud import crud_bp
+from app.services.db import DBManager
 import os
 
 def create_app():
@@ -24,4 +25,5 @@ def create_app():
 
     api.register_blueprint(main_bp)
     api.register_blueprint(crud_bp)
+    DBManager().check_coherence()
     return app
