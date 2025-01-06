@@ -13,7 +13,7 @@ class Config:
         "sqlite": {
             "DB_HOST" : "inmemory.db"
         },
-        "mysql": {
+        "mysql-docker": {
             "DB_HOST": 'db',
             "DB_PORT": '3306',
             "DB_NAME": 'your_database_name',
@@ -22,6 +22,7 @@ class Config:
         }
     }
     DDL_NAME = "models/ddl.sql"
+    MYSQL_DDL_NAME = "models/mysql_ddl.sql"
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,
