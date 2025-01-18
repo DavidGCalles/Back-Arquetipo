@@ -1,12 +1,20 @@
+"""
+This module initializes the Flask application, configures the API and CORS settings, 
+registers the blueprints, and checks the database coherence.
+"""
+import os
 from flask import Flask
 from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
 from app.routes.demo_crud import crud_bp
+from app.routes.rpi import rpi_bp
 from app.services.db import DBManager
-import os
+
 
 def create_app():
+    """Initializes the Flask application, configures the API and CORS settings,
+    registers the blueprints, and checks the database coherence."""
     app = Flask(__name__)
     app.url_map.strict_slashes = False
     app.config["API_TITLE"] = "Flask API"
@@ -19,11 +27,13 @@ def create_app():
     if os.getenv("SWAGGER_HOST"):
         app.config['SWAGGER_UI_HOST'] = os.getenv("SWAGGER_UI_HOST")
     CORS(app, origins=["https://front-arquetipo-856517455627.europe-southwest1.run.app"],
-         expose_headers=['Content-Type'], 
+         expose_headers=['Content-Type'],
          supports_credentials=True)
     api = Api(app)
 
     api.register_blueprint(main_bp)
     api.register_blueprint(crud_bp)
+    if os.getenv("RPI_MODULE"):
+        api.register_blueprint(rpi_bp)
     DBManager().check_coherence()
     return app
