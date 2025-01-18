@@ -1,25 +1,10 @@
-import sqlite3
+from app.services.db import DBManager
 
 class GPIOControlDAO:
     def __init__(self):
-        self.connection = None
-
-    def set_database(self, db_path: str):
-        self.connection = sqlite3.connect(db_path)
-        self._create_table()
-
-    def _create_table(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS gpio_pins (
-            pin_number INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            mode TEXT CHECK(mode IN ('INPUT', 'OUTPUT')), 
-            state TEXT CHECK(state IN ('HIGH', 'LOW')) DEFAULT NULL,
-            pull TEXT CHECK(pull IN ('PULL_UP', 'PULL_DOWN', 'NONE')) DEFAULT 'NONE'
-        );
-        """
-        self.connection.execute(query)
-        self.connection.commit()
+        self.db_manager = DBManager()
+        self.db_manager.reset_db_settings("sqlite-rpi")
+        self.connection = DBManager().get_db_connection()
 
     def insert_or_ignore(self, pin_number: int, name: str, mode: str, state: str, pull: str):
         query = """

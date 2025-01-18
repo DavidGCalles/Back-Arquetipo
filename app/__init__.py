@@ -35,5 +35,8 @@ def create_app():
     api.register_blueprint(crud_bp)
     if os.getenv("RPI_MODULE"):
         api.register_blueprint(rpi_bp)
+        sqlite_manager = DBManager()
+        sqlite_manager.reset_db_settings("sqlite-rpi")
+        sqlite_manager.check_coherence()
     DBManager().check_coherence()
     return app
