@@ -33,4 +33,4 @@ class GPIOController:
 
     def cleanup_all(self):
         self.cao.cleanup_all()
-        self.dao.delete_all()
+        #self.dao.delete_all()
