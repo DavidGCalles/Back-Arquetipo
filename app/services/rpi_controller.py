@@ -2,9 +2,8 @@ from app.dao.rpi_dao import GPIOControlDAO
 from app.services.rpi_cao import GPIOControlCAO
 
 class GPIOController:
-    def __init__(self, db_path: str):
+    def __init__(self):
         self.dao = GPIOControlDAO()
-        self.dao.set_database(db_path)
         self.cao = GPIOControlCAO()
 
     def setup_pins_from_db(self):
