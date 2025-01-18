@@ -22,4 +22,3 @@ class RpiCollection(MethodView):
         """
         LOGGER.info("GET RPI method called")
         return jsonify(True), 200
-    
