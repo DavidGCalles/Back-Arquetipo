@@ -7,6 +7,7 @@
 /app/tests/__pycache__
 secrets_file.py
 inmemory.db*
+rpi.db*
 .coverage
 coverage.lcov
 .vscode/
