@@ -1,7 +1,6 @@
 from flask import Flask
 from app import create_app
 import os
-import pytest
 from unittest.mock import patch
 
 def test_create_app():
