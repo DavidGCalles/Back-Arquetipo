@@ -25,7 +25,7 @@ def create_app():
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     if os.getenv("SWAGGER_HOST"):
-        app.config['SWAGGER_UI_HOST'] = os.getenv("SWAGGER_UI_HOST")
+        app.config['SWAGGER_UI_HOST'] = os.getenv("SWAGGER_HOST")
     CORS(app, origins=["https://front-arquetipo-856517455627.europe-southwest1.run.app"],
          expose_headers=['Content-Type'],
          supports_credentials=True)
