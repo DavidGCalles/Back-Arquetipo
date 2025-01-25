@@ -7,3 +7,23 @@ CREATE TABLE IF NOT EXISTS gpio_pins (
             protocol TEXT CHECK(protocol IN ('I2C', 'SPI', 'UART', 'GPIO', 'ONEWIRE')) DEFAULT 'GPIO',
             object_type TEXT CHECK(object_type IN ('SENSOR', 'ACTUATOR', 'OTHER')) DEFAULT 'OTHER'
         );
+
+CREATE TABLE IF NOT EXISTS devices (
+    device_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT CHECK(type IN ('SENSOR', 'ACTUATOR')) DEFAULT 'OTHER',
+    manufacturer TEXT,
+    model TEXT,
+    serial_number TEXT UNIQUE,
+    purchase_date DATE,
+    warranty_expiration DATE,
+    location TEXT,
+    status TEXT CHECK(status IN ('ACTIVE', 'INACTIVE', 'MAINTENANCE', 'RETIRED')) DEFAULT 'ACTIVE',
+    pin_number INTEGER,
+    range_min INTEGER,
+    range_max INTEGER,
+    measure_unit TEXT,
+    last_used TIMESTAMP,
+    value TEXT,
+    FOREIGN KEY (pin_number) REFERENCES gpio_pins(pin_number)
+);
