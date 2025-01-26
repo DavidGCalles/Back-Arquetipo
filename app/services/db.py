@@ -70,6 +70,7 @@ class DBManager:
 
     def get_db_connection(self):
         """Creates and return a db connection with the parameters given in config class"""
+        LOGGER.debug("Conectando a la base de datos %s", self.db_type)
         if self.db_type == "sqlite":
             try:
                 connection = sqlite3.connect(self.db_settings["DB_HOST"])
