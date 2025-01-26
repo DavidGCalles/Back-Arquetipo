@@ -9,6 +9,15 @@ class GPIOControlDAO:
         self.table = "gpio_pins"
 
     def insert_or_ignore(self, data: dict):
+        """
+        Insert data into the database if it does not exist.
+        Keys in data: pin_number, name, mode, state, pull, protocol, object_type.
+        
+        Args:
+            data (dict): Data to insert.
+        Returns:
+            bool: True if the data was inserted, False otherwise.
+        """
         try:
             columns = ', '.join(data.keys())
             placeholders = ', '.join('?' * len(data))
@@ -18,10 +27,20 @@ class GPIOControlDAO:
             self.connection.commit()
             return True
         except Exception as e:
-            LOGGER.error(f"Error inserting data: {e}")
+            LOGGER.error("Error inserting data: %s", e)
             return False
 
     def update_pin(self, pin_number: int, fields: dict):
+        """
+        Update a pin in the database.
+        Keys in fields: name, mode, state, pull, protocol, object_type.
+        
+        Args:
+            pin_number (int): Pin number.
+            fields (dict): Fields to update.
+        Returns:
+            bool: True if the data was updated, False otherwise.
+        """
         if not fields:
             return  # No updates to perform
 
