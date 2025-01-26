@@ -79,15 +79,21 @@ class DeviceDAO:
     def __init__(self):
         self.db_manager = DBManager()
         self.db_manager.reset_db_settings("sqlite-rpi")
-        self.connection = DBManager().get_db_connection()
+        self.connection = self.db_manager.get_db_connection()
+        self.table = "devices"
 
-    def insert_device(self, name: str, type: str, manufacturer: str, model: str, serial_number: str, purchase_date: str, warranty_expiration: str, location: str, status: str, pin_number: int, range_min: int, range_max: int, measure_unit: str, last_used: str, value: str):
-        query = """
-        INSERT INTO devices (name, type, manufacturer, model, serial_number, purchase_date, warranty_expiration, location, status, pin_number, range_min, range_max, measure_unit, last_used, value)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """
-        self.connection.execute(query, (name, type, manufacturer, model, serial_number, purchase_date, warranty_expiration, location, status, pin_number, range_min, range_max, measure_unit, last_used, value))
-        self.connection.commit()
+    def insert_device(self, device_info: dict):
+        try:
+            columns = ', '.join(device_info.keys())
+            placeholders = ', '.join(['?' for _ in device_info])
+            query = f"INSERT INTO devices ({columns}) VALUES ({placeholders});"
+            
+            self.connection.execute(query, tuple(device_info.values()))
+            self.connection.commit()
+            return True
+        except Exception as e:
+            LOGGER.error(f"Error inserting device: {e}")
+            return False
 
     def update_device(self, device_id: int, data: dict) -> bool:
         try:

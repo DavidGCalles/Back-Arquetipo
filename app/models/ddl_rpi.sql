@@ -10,8 +10,9 @@ CREATE TABLE IF NOT EXISTS gpio_pins (
 
 CREATE TABLE IF NOT EXISTS devices (
     device_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bus_id TEXT,
     name TEXT NOT NULL,
-    type TEXT CHECK(type IN ('SENSOR', 'ACTUATOR')) DEFAULT 'OTHER',
+    device_type TEXT CHECK(device_type IN ('SENSOR', 'ACTUATOR')) DEFAULT 'OTHER',
     manufacturer TEXT,
     model TEXT,
     serial_number TEXT UNIQUE,

@@ -104,7 +104,7 @@ class DeviceCollection(MethodView):
     """
     @rpi_bp.response(200, DeviceSchema, description="Device data successfully retrieved.")
     @rpi_bp.doc(summary="Retrieve device data", description="Retrieve data for a specific device ID.")
-    def get(self, device_id:int):
+    def get(self):
         """
         GET method: Retrieve data for a specific device ID.
         """
@@ -115,11 +115,12 @@ class DeviceCollection(MethodView):
     @rpi_bp.arguments(DeviceSchema)
     @rpi_bp.response(201, MessageResponseSchema, description="New device successfully inserted.")
     @rpi_bp.doc(summary="Insert new device", description="Insert a new device into the database.")
-    def post(self):
+    def post(self, request):
         """
         POST method: Insert data for a new device.
         """
-        result = DeviceDAO().insert_or_ignore(request.json)
+        request.pop("device_id", None)  # Remove device_id from request
+        result = DeviceDAO().insert_device(request)
         if result:
             return {"message": "New device inserted"}, 201
         return {"message": "There was a problem inserting the device"}, 503
@@ -136,6 +137,8 @@ class DeviceCrud(MethodView):
             return jsonify(DeviceDAO().get_device(device_id)), 200
         except KeyError:
             return jsonify({"error": "Device ID not initialized"}), 404
+    @rpi_bp.response(200, MessageResponseSchema, description="Device data successfully deleted.")
+    @rpi_bp.doc(summary="Delete device data", description="Delete data for a specific device ID.")
     def delete(self, device_id):
         """
         DELETE method: Delete data for a specific device ID.
@@ -144,11 +147,15 @@ class DeviceCrud(MethodView):
         if result:
             return {"message": "Device successfully deleted"}, 200
         return {"message": "Device not found"}, 404
-    def patch(self, device_id:int):
+    @rpi_bp.arguments(DeviceSchema)
+    @rpi_bp.response(200, MessageResponseSchema, description="Device data successfully updated.")
+    @rpi_bp.doc(summary="Update device data", description="Update data for a specific device ID.")
+    def patch(self,request, device_id:int):
         """
         PATCH method: Update data for a specific device ID.
         """
-        result = DeviceDAO().update_device(device_id, request.json)
+        request.pop("device_id", None)
+        result = DeviceDAO().update_device(device_id, request)
         if result:
             return {"success": True}, 200
         return {"message": "Device not found"}, 404

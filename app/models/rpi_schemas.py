@@ -19,8 +19,9 @@ class DeviceSchema(Schema):
     DeviceSchema: Class to manage the schema of the devices.
     """
     device_id = fields.Int(required=True, metadata={"description": "Device ID"})
+    bus_id = fields.Str(metadata={"description": "Bus ID, for sensors or actuators connected to a bus"})
     name = fields.Str(required=True, metadata={"description": "Name of the device"})
-    type = fields.Str(validate=lambda x: x in ['SENSOR', 'ACTUATOR'], metadata={"description": "Type of the device"})
+    device_type = fields.Str(validate=lambda x: x in ['SENSOR', 'ACTUATOR'], metadata={"description": "Type of the device"})
     manufacturer = fields.Str(metadata={"description": "Manufacturer of the device"})
     model = fields.Str(metadata={"description": "Model of the device"})
     serial_number = fields.Str(metadata={"description": "Serial number of the device"})
