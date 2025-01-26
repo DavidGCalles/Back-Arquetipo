@@ -1,5 +1,5 @@
 """Main Blueprint, made for checking services"""
-from flask import jsonify
+from flask import jsonify, current_app
 from flask_smorest import Blueprint
 from app.services.db import DBManager
 from config import LOGGER
@@ -28,3 +28,16 @@ def test_db():
         return jsonify({"message": "Database Correctly Connected"}), 200
     else:
         return jsonify({"message": "Database Not Connected"}), 503
+    
+@main_bp.route('/check_blueprints', methods=["GET"])
+@main_bp.response(200, {"message": {"type": "string"}, "blueprints": {"type": "array", "items": {"type": "object", "properties": {"name": {"type": "string"}, "url_prefix": {"type": "string"}}}}}, description="Blueprints are correctly registered.")
+@main_bp.response(503, {"message": {"type": "string"}}, description="Blueprints are not correctly registered.")
+def check_blueprints():
+    """
+    Tests if the blueprints are correctly registered and returns the status.
+    """
+    if current_app.blueprints:
+        blueprints_info = [{"name": name, "url_prefix": blueprint.url_prefix} for name, blueprint in current_app.blueprints.items()]
+        return jsonify({"message": "Blueprints are correctly registered", "blueprints": blueprints_info}), 200
+    else:
+        return jsonify({"message": "Blueprints are not correctly registered"}), 503
