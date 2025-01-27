@@ -1,24 +1,46 @@
-# Use new_readme.md
+# Introduction
 
-## Historic Knowledge
-Initially this project was one big archetype but wanting to be used on cloud run deployments we had to split it up to be more versatile.
+## PRE-REQUIREMENTS
+1. GIT
+2. Python/pip
+3. Docker
 
-This repository isolates the backend part of that project and aims to be a solid backbone to deploy any API needed on cloud run and another serverless services. We have an archetype working right here:
-https://back-arquetipo-856517455627.europe-southwest1.run.app/swagger
+## CLONING
 
-# How to execute
+    git clone https://github.com/DavidGCalles/Back-Arquetipo
+
+## STANDARD RUN METHOD
+Followed by:
+
+    docker-compose up -d
+
+# Ways to Run It
 
 ## Standalone
-    python run.py
+You can run:
 
-# How to deploy with docker
-1. docker run -d -p 5000:5000 your-image-name
-2. http://localhost:5000/swagger
+    run.py
 
-# Known issues
-- It lacks DB connection in Cloud Run because we dont know if its advisable to spin a db container in this kind of setup.
+And it will work the same as if you run it from docker, without its niceties. It will run on the development server of Flask and write to a sqlite inmemory database that will be erased when finishing the program.
+
+## Docker
+    docker-compose up -d
+    
+It deploy 2 containers, one for the backend, other for the test db. You can test de db connection in:
+
+   http://localhost:5000/swagger
+
+## Raspberry Pi
+If you intend to use this backend in a raspberry pi to have pin acces is mandatory you run in standalone mode. This is because if you execute this inside docker, you will have to jump fire hoops to have pin access. Its better this way, because you can connect an archetype frontend in other ways.
+
+It's important to set RPI_MODULE variable to any value to detect the need of pin control.
+
 
 # How to deploy to Cloud Run
+
+You can find a running prototype here. You can't do much because db connections are not configured yet on cloud:
+
+https://back-arquetipo-856517455627.europe-southwest1.run.app/swagger
 
 ## Prerequisites
 1. Check if the container builds and runs locally. This step is very important, because you can avoid a lot of headaches knowing for sure your build runs.
@@ -27,15 +49,15 @@ https://back-arquetipo-856517455627.europe-southwest1.run.app/swagger
 
 1. Go to: https://console.cloud.google.com/run
 1. Select your project.
-1. Click on deploy container and then service, service [insertar imagen deploycontainer.png]
-1. Implement from Github [selectgithub.png]
+1. Click on deploy container and then service, service
+1. Implement from Github
 
 ### Core Configuration
-1. Configure minimal Cloud Build (is mandatory)[setupcloudbuild]
+1. Configure minimal Cloud Build (is mandatory)
     1. Connect your github if its not connected.
     1. Select the repository (the fork of the arquetype on which the app is developed)
     1. Push Next. Select Dockerfile build type
-1. Configure name and region (important on pricing and time response)[configureService.png]
+1. Configure name and region (important on pricing and time response)
     1. With auth, we select allow unauthenticated invocations because we want the service to be public.
 1. Select CPU allocation and scaling. Its an important section because it has influence in pricing and time response.
     1. Take care with autoscaling. If you set it to 1, you will always have 1 instance up.
@@ -53,3 +75,28 @@ https://back-arquetipo-856517455627.europe-southwest1.run.app/swagger
 Create service.
 
 This will create the cloud build trigger and the cloud run function as service.
+
+
+# Unordered sections
+
+## List of ENV variables used in the app
+1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work. This variable is used inside app/_ _ init _ _.py. This will select the correct host depending on the deployment type.
+
+2. DATABASE_TYPE: This variable determines what set of variables your instance will get to connect to the database. It defaults to "sqlite". Docker compose sets it up to the db container.
+
+3. RPI_MODULE: In this moment, setting up this variable loads RPI blueprint for control. Value? Whatever you want, its not used
+
+## Testing
+Execute this commands in the root folder.
+If you have problems with importing modules, try:
+
+    export PYTHONPATH=<absolute-path to folder>
+    set PYTHONPATH=<absolute-path to folder>
+
+To run the tests:
+
+    pytest
+
+If you want to generate lcov files:
+
+    pytest --cov=. --cov-report=lcov
