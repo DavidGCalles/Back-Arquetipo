@@ -13,16 +13,27 @@ class Config:
         "sqlite": {
             "DB_HOST" : "inmemory.db"
         },
+        "sqlite-rpi": {
+            "DB_HOST": "rpi.db"
+        },
         "mysql-docker": {
             "DB_HOST": 'db',
             "DB_PORT": '3306',
             "DB_NAME": 'your_database_name',
             "DB_USER": 'root',
             "DB_PASSWORD": 'toor'
+        },
+        "mysql": {
+            "DB_HOST": 'localhost',
+            "DB_PORT": '3306',
+            "DB_NAME": 'your_database_name',
+            "DB_USER": 'root',
+            "DB_PASSWORD": 'toor'
         }
     }
-    DDL_NAME = "models/ddl.sql"
-    MYSQL_DDL_NAME = "models/mysql_ddl.sql"
+    DDL_NAME = "models/ddl_sqlite.sql"
+    DDL_RPI_NAME = "models/ddl_rpi.sql"
+    DDL_MYSQL_NAME = "models/ddl_rpi.sql"
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,

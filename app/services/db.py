@@ -30,11 +30,27 @@ class DBManager:
             except Exception as e:
                 LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
                 return False
+        elif self.db_type == "sqlite-rpi":
+            try:
+                conn = self.get_db_connection()
+                cur = conn.cursor()
+                ddl_path = self.project_root / Config.DDL_RPI_NAME
+                LOGGER.info("Cargando ddl-rpi")
+                with open(ddl_path, 'r', encoding="UTF-8") as file:
+                    sql_script = file.read()
+                cur.executescript(sql_script)
+                conn.commit()
+                conn.close()
+                LOGGER.info("Comprobación terminada")
+                return True
+            except Exception as e:
+                LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
+                return False
         elif self.db_type in ["mysql", "mysql-docker"]:
             try:
                 conn = self.get_db_connection()
                 cur = conn.cursor()
-                ddl_path = self.project_root / Config.MYSQL_DDL_NAME
+                ddl_path = self.project_root / Config.DDL_MYSQL_NAME
                 LOGGER.info("Cargando ddl")
                 with open(ddl_path, 'r', encoding="UTF-8") as file:
                     sql_script = file.read()
@@ -47,15 +63,27 @@ class DBManager:
             except Exception as e:
                 LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
                 return False
-            
+
+    def reset_db_settings(self, new_db_type:str):
+        self.db_type = new_db_type
+        self.db_settings = Config.DB_TYPES[self.db_type]
+
     def get_db_connection(self):
         """Creates and return a db connection with the parameters given in config class"""
+        LOGGER.debug("Conectando a la base de datos %s", self.db_type)
         if self.db_type == "sqlite":
             try:
                 connection = sqlite3.connect(self.db_settings["DB_HOST"])
                 return connection
             except Error as e:
                 LOGGER.error("Error connecting to SQLite3: %s",e)
+                return None
+        elif self.db_type == "sqlite-rpi":
+            try:
+                connection = sqlite3.connect(self.db_settings["DB_HOST"])
+                return connection
+            except Error as e:
+                LOGGER.error("Error connecting to SQLite3 for RPI control: %s",e)
                 return None
         elif self.db_type in ["mysql","mysql-docker"]:
             try:
