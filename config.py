@@ -4,6 +4,7 @@ import logging
 
 class Config:
     """Stores every config detail needed"""
+    FLASK_ENV = None
     SECRET_KEY = 'your_secret_key'  # Replace with your actual secret key
     SWAGGER = {
         'title': 'Flask API',
