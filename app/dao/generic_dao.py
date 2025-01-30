@@ -132,10 +132,9 @@ class BaseDAO:
         cursor = self.connection.cursor()
         try:
             cursor.execute(query, values)  # Execute with values tuple to safely pass data
-            new_id = cursor.lastrowid  # Retrieves the last inserted ID
             self.connection.commit()
+            new_id = cursor.lastrowid  # Retrieves the last inserted ID
         except Exception as e:
-            self.connection.rollback()
             LOGGER.error("Error inserting data: %s", e)
             new_id = None
         finally:
