@@ -11,6 +11,11 @@ class ItemSchema(Schema):
     name = fields.Str(required=True, metadata={"description": "Name of the item"})
     description = fields.Str(required=False, metadata={"description": "Description of the item"})
 
+    @staticmethod
+    def from_array_to_json(values):
+        keys = ItemSchema().fields.keys()
+        return dict(zip(keys, values))
+
 class UpdateItemSchema(Schema):
     """
     UpdateItemSchema: Class to manage the schema of the items to update.
@@ -19,6 +24,11 @@ class UpdateItemSchema(Schema):
     name = fields.Str(required=False, metadata={"description": "Updated name"})
     description = fields.Str(required=False, metadata={"description": "Updated description"})
 
+    @staticmethod
+    def from_array_to_json(values):
+        keys = UpdateItemSchema().fields.keys()
+        return dict(zip(keys, values))
+
 class SearchItemSchema(Schema):
     """
     SearchItemSchema: Class to manage the schema of the items to search.
@@ -26,6 +36,11 @@ class SearchItemSchema(Schema):
     name = fields.Str(required=False)
     id = fields.Int(required=False)
     description = fields.Str(required=False, metadata={"description": "Updated description"})
+
+    @staticmethod
+    def from_array_to_json(values):
+        keys = SearchItemSchema().fields.keys()
+        return dict(zip(keys, values))
 
 class SuccessResponseSchema(Schema):
     """
