@@ -2,8 +2,9 @@
 demo_schemas: Module to manage the schemas of the demo application.
 """
 from marshmallow import Schema, fields
+from app.models.base_schema import BaseSchema
 
-class ItemSchema(Schema):
+class ItemSchema(BaseSchema):
     """
     ItemSchema: Class to manage the schema of the items.
     """
@@ -11,7 +12,7 @@ class ItemSchema(Schema):
     name = fields.Str(required=True, metadata={"description": "Name of the item"})
     description = fields.Str(required=False, metadata={"description": "Description of the item"})
 
-class UpdateItemSchema(Schema):
+class UpdateItemSchema(BaseSchema):
     """
     UpdateItemSchema: Class to manage the schema of the items to update.
     """
@@ -19,13 +20,14 @@ class UpdateItemSchema(Schema):
     name = fields.Str(required=False, metadata={"description": "Updated name"})
     description = fields.Str(required=False, metadata={"description": "Updated description"})
 
-class SearchItemSchema(Schema):
+class SearchItemSchema(BaseSchema):
     """
     SearchItemSchema: Class to manage the schema of the items to search.
     """
     name = fields.Str(required=False)
     id = fields.Int(required=False)
     description = fields.Str(required=False, metadata={"description": "Updated description"})
+
 
 class SuccessResponseSchema(Schema):
     """
