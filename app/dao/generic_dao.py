@@ -123,7 +123,7 @@ class BaseDAO:
         placeholders = ", ".join([self.placeholder] * len(insert_data))  # Use the appropriate placeholder
 
         # Construct the SQL query with placeholders
-        query = f"INSERT{" OR IGNORE" if ignore_flag else ""} INTO {self.table} ({keys}) VALUES ({placeholders});"
+        query = f"INSERT{' OR IGNORE' if ignore_flag else ''} INTO {self.table} ({keys}) VALUES ({placeholders});"
 
         # Convert insert_data values to a tuple for the execute method
         values = tuple(insert_data.values())
