@@ -1,4 +1,3 @@
-from app.services.db import DBManager
 from app.dao.generic_dao import BaseDAO
 from config import LOGGER
 
