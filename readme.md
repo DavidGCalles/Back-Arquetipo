@@ -97,9 +97,6 @@ If you want to generate lcov files:
     pytest --cov=. --cov-report=lcov
 
 ## Raspberry Pi
-At date 27-01-2025, branch AR-45 diverges from the main archetype and they wont be mergeable with eachother.
-
-AR-45 will be able to integrate main changes, but not in the other direction. This is because AR-45 contains code refering the proper architecture of raspberry pi and libraries only available with that architecture. This is the same reason why you cant run the Pi variant with Docker.
 
 If you intend to use this backend in a raspberry pi to have pin acces is mandatory you run in standalone mode. This is because if you execute this inside docker, you will have to jump fire hoops to have pin access. Its better this way, because you can connect an archetype frontend in other ways.
 
