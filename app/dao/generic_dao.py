@@ -35,7 +35,7 @@ class BaseDAO:
             cursor.close()
             self.connection.close()
         return data
-    
+   
     def generic_get_by_field(self, field:str, value, like:bool=False):
         """
         Fetches a record from the database based on a specific field value.

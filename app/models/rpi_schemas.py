@@ -16,6 +16,11 @@ class PinSchema(Schema):
     protocol = fields.Str(validate=lambda x: x in ['I2C', 'SPI', 'UART', 'GPIO', 'ONEWIRE'], metadata={"description": "Pin protocol: I2C, SPI, UART, GPIO, ONEWIRE"})
     object_type = fields.Str(validate=lambda x: x in ['SENSOR', 'ACTUATOR', 'OTHER'], metadata={"description": "Pin object type: SENSOR, ACTUATOR, OTHER"})
 
+    @staticmethod
+    def from_array_to_json(values):
+        keys = PinSchema().fields.keys()
+        return dict(zip(keys, values))
+
 class DeviceSchema(Schema):
     """
     DeviceSchema: Class to manage the schema of the devices.
@@ -37,3 +42,8 @@ class DeviceSchema(Schema):
     measure_unit = fields.Str(metadata={"description": "Measurement unit of the device"})
     last_used = fields.DateTime(metadata={"description": "Last used date of the device"})
     value = fields.Str(metadata={"description": "Value of the device"})
+
+    @staticmethod
+    def from_array_to_json(values):
+        keys = DeviceSchema().fields.keys()
+        return dict(zip(keys, values))

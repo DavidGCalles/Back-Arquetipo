@@ -1,4 +1,5 @@
 from app.dao.generic_dao import BaseDAO
+from app.models.rpi_schemas import PinSchema, DeviceSchema
 from config import LOGGER
 
 class GPIOControlDAO(BaseDAO):
@@ -38,13 +39,19 @@ class GPIOControlDAO(BaseDAO):
             return True
         return False
 
-    def get_all_pins(self): 
-        return self.generic_get_all()
+    def get_all_pins(self):
+        result = self.generic_get_all()
+        if result:
+            model_list = []
+            for pin in result:
+                model_list.append(PinSchema.from_array_to_json(pin))
+            return model_list
+        return []
 
     def get_pin(self, pin_number: int): 
         result = self.generic_get_by_field("pin_number", pin_number)
         if result:
-            return result
+            return PinSchema.from_array_to_json(result)
         return {}
     
     def delete_pin(self, pin_number: int):
@@ -54,8 +61,6 @@ class GPIOControlDAO(BaseDAO):
         except Exception as e:
             LOGGER.error(f"Error deleting pin: {e}")
             return False
-
-
 
 class DeviceDAO(BaseDAO):
     def __init__(self):
@@ -77,12 +82,20 @@ class DeviceDAO(BaseDAO):
         return False
 
     def get_all_devices(self):
-        return self.generic_get_all()
+        result = self.generic_get_all()
+        LOGGER.error(f"Devices: {result}")
+        if result:
+            model_list = []
+            for device in result:
+                model_list.append(DeviceSchema.from_array_to_json(device))
+            LOGGER.error(f"Devices: {model_list}")
+            return model_list
+        return []
     
     def get_device(self, device_id: int):
         result = self.generic_get_by_field("device_id", device_id)
         if result:
-            return result
+            return DeviceSchema.from_array_to_json(result)
         return {}
 
     def delete_device(self, device_id: int):
