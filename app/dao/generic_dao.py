@@ -233,10 +233,10 @@ class BaseDAO:
         Raises:
         - Exception: If the SQL execution fails or if there are issues with the database connection.
         """
+        success = False
         try:
             self.connection = DBManager().get_db_connection()
             query = f"DELETE FROM {self.table} WHERE {pk} = {self.placeholder}"
-            LOGGER.info(query)
             cursor = self.connection.cursor()
             try:
                 cursor.execute(query, (id_to_delete,))
@@ -246,6 +246,6 @@ class BaseDAO:
                 cursor.close()
                 self.connection.close()
         except Exception as e:
-            LOGGER.error(f"Error deleting record: {e}")
+            LOGGER.error("Error deleting record: %s", e)
             success = False
         return success
