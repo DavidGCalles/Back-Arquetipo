@@ -42,16 +42,17 @@ class GPIOControlDAO(BaseDAO):
     def get_all_pins(self):
         result = self.generic_get_all()
         if result:
+            LOGGER.info(f"Result: {result}")
             model_list = []
             for pin in result:
-                model_list.append(PinSchema.from_array_to_json(pin))
+                model_list.append(PinSchema().from_array_to_json(pin))
             return model_list
         return []
 
     def get_pin(self, pin_number: int): 
         result = self.generic_get_by_field("pin_number", pin_number)
         if result:
-            return PinSchema.from_array_to_json(result)
+            return PinSchema().from_array_to_json(result)
         return {}
     
     def delete_pin(self, pin_number: int):
@@ -86,14 +87,14 @@ class DeviceDAO(BaseDAO):
         if result:
             model_list = []
             for device in result:
-                model_list.append(DeviceSchema.from_array_to_json(device))
+                model_list.append(DeviceSchema().from_array_to_json(device))
             return model_list
         return []
     
     def get_device(self, device_id: int):
         result = self.generic_get_by_field("device_id", device_id)
         if result:
-            return DeviceSchema.from_array_to_json(result)
+            return DeviceSchema().from_array_to_json(result)
         return {}
 
     def delete_device(self, device_id: int):

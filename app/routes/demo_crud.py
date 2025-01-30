@@ -22,7 +22,7 @@ class ItemCollection(MethodView):
         """
         data = crud_dao.generic_get_all()
         if data:
-            data = [ItemSchema.from_array_to_json(item) for item in data]
+            data = [ItemSchema().from_array_to_json(item) for item in data]
         return jsonify(data), 200
 
     @crud_bp.arguments(ItemSchema)
@@ -50,7 +50,7 @@ class ItemResource(MethodView):
         """
         item = crud_dao.generic_get_by_field("id", item_id)
         if item:
-            return jsonify(ItemSchema.from_array_to_json(item)), 200
+            return jsonify(ItemSchema().from_array_to_json(item)), 200
         return {"message": "Item not found"}, 404
 
     @crud_bp.arguments(UpdateItemSchema)
@@ -117,5 +117,5 @@ class ItemSearch(MethodView):
 
         results = crud_dao.generic_search(query_params, True)
         if results:
-            results = [ItemSchema.from_array_to_json(item) for item in results]
+            results = [ItemSchema().from_array_to_json(item) for item in results]
         return jsonify(results), 200
