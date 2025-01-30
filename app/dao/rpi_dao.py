@@ -83,12 +83,10 @@ class DeviceDAO(BaseDAO):
 
     def get_all_devices(self):
         result = self.generic_get_all()
-        LOGGER.error(f"Devices: {result}")
         if result:
             model_list = []
             for device in result:
                 model_list.append(DeviceSchema.from_array_to_json(device))
-            LOGGER.error(f"Devices: {model_list}")
             return model_list
         return []
     
