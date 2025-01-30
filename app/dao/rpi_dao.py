@@ -1,34 +1,26 @@
 from app.services.db import DBManager
+from app.dao.generic_dao import BaseDAO
 from config import LOGGER
 
-class GPIOControlDAO:
+class GPIOControlDAO(BaseDAO):
     def __init__(self):
-        self.db_manager = DBManager()
+        super().__init__()
         self.db_manager.reset_db_settings("sqlite-rpi")
-        self.connection = self.db_manager.get_db_connection()
         self.table = "gpio_pins"
 
     def insert_or_ignore(self, data: dict):
         """
-        Insert data into the database if it does not exist.
-        Keys in data: pin_number, name, mode, state, pull, protocol, object_type.
-        
+        Insert a new row in the database if it does not exist.
+
         Args:
             data (dict): Data to insert.
         Returns:
-            bool: True if the data was inserted, False otherwise.
+            bool: True if the data was inserted, False otherwise
         """
-        try:
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join('?' * len(data))
-            values = tuple(data.values())
-            query = f"INSERT OR IGNORE INTO {self.table} ({columns}) VALUES ({placeholders})"
-            self.connection.execute(query, values)
-            self.connection.commit()
+        result = self.generic_insert(data,True)
+        if result:
             return True
-        except Exception as e:
-            LOGGER.error("Error inserting data: %s", e)
-            return False
+        return False
 
     def update_pin(self, pin_number: int, fields: dict):
         """
@@ -41,58 +33,29 @@ class GPIOControlDAO:
         Returns:
             bool: True if the data was updated, False otherwise.
         """
-        if not fields:
-            return  # No updates to perform
+        result = self.generic_update("pin_number", fields)
+        if result:
+            return True
+        return False
 
-        # Validate pin_number
-        if not isinstance(pin_number, int):
-            raise ValueError("pin_number must be an integer")
+    def get_all_pins(self) -> list[dict[str, str]]: 
+        return self.generic_get_all()
 
-        # Validate immutable fields
-        immutable_fields = ["pin_number"]
-        for field in fields.keys():
-            if field in immutable_fields:
-                raise ValueError(f"Cannot update field '{field}'")
-
-        set_clause = ", ".join([f"{key} = ?" for key in fields.keys()])
-        params = list(fields.values()) + [pin_number]
-
-        query = f"""
-        UPDATE gpio_pins
-        SET {set_clause}
-        WHERE pin_number = ?;
-        """
-        self.connection.execute(query, params)
-        self.connection.commit()
-        return True
-
-    def get_all_pins(self) -> list[dict[str, str]]:
-        query = "SELECT * FROM gpio_pins;"
-        cursor = self.connection.execute(query)
-        columns = [column[0] for column in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-    def get_pin(self, pin_number: int) -> dict[str, str]:
-        query = "SELECT * FROM gpio_pins WHERE pin_number = ?;"
-        cursor = self.connection.execute(query, (pin_number,))
-        row = cursor.fetchone()
-        if row is None:
-            return {}
-        columns = [column[0] for column in cursor.description]
-        return dict(zip(columns, row))
+    def get_pin(self, pin_number: int) -> dict[str, str]: 
+        result = self.generic_get_by_field("pin_number", pin_number)
+        if result:
+            return result
+        return {}
     
     def delete_pin(self, pin_number: int):
         try:
-            self.connection.execute("DELETE FROM gpio_pins WHERE pin_number = ?;", (pin_number,))
-            self.connection.commit()
+            self.generic_delete("pin_number", pin_number)
             return True
         except Exception as e:
             LOGGER.error(f"Error deleting pin: {e}")
             return False
 
-    def delete_all(self):
-        self.connection.execute("DELETE FROM gpio_pins;")
-        self.connection.commit()
+
 
 class DeviceDAO:
     def __init__(self):
@@ -101,7 +64,7 @@ class DeviceDAO:
         self.connection = self.db_manager.get_db_connection()
         self.table = "devices"
 
-    def insert_device(self, device_info: dict):
+    def insert_device(self, device_info: dict): #Este sería generico
         try:
             columns = ', '.join(device_info.keys())
             placeholders = ', '.join(['?' for _ in device_info])
@@ -114,7 +77,7 @@ class DeviceDAO:
             LOGGER.error(f"Error inserting device: {e}")
             return False
 
-    def update_device(self, device_id: int, data: dict) -> bool:
+    def update_device(self, device_id: int, data: dict) -> bool: #Generico. Se puede quedar y configurar el diccionario
         try:
             updates = []
             params = []
@@ -136,19 +99,19 @@ class DeviceDAO:
             print(f"An error occurred: {e}")
             return False
 
-    def get_all_devices(self) -> list[dict[str, str]]:
+    def get_all_devices(self) -> list[dict[str, str]]: #Generico
         query = "SELECT * FROM devices;"
         cursor = self.connection.execute(query)
         columns = [column[0] for column in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
     
-    def get_device(self, device_id: int) -> dict[str, str]:
+    def get_device(self, device_id: int) -> dict[str, str]: #Generico
         query = "SELECT * FROM devices WHERE device_id = ?;"
         cursor = self.connection.execute(query, (device_id,))
         columns = [column[0] for column in cursor.description]
         return dict(zip(columns, cursor.fetchone()))
 
-    def delete_device(self, device_id: int):
+    def delete_device(self, device_id: int): #Generico
         try:
             self.connection.execute("DELETE FROM devices WHERE device_id = ?;", (device_id,))
             self.connection.commit()
