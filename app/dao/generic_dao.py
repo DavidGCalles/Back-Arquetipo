@@ -31,7 +31,7 @@ class BaseDAO:
         data = cursor.fetchall()
         return data
     
-    def generic_get_by_field(self, field:str, value:str|int, like:bool=False):
+    def generic_get_by_field(self, field:str, value, like:bool=False):
         """
         Fetches a record from the database based on a specific field value.
         It has the option to use a LIKE clause for partial matching.
@@ -185,7 +185,7 @@ class BaseDAO:
         self.connection.commit()
         return cursor.rowcount
 
-    def generic_delete(self, pk:str, id_to_delete:str|int):
+    def generic_delete(self, pk:str, id_to_delete):
         """
         Deletes a record from the database based on the primary key and its value.
 
@@ -208,8 +208,14 @@ class BaseDAO:
         Raises:
         - Exception: If the SQL execution fails or if there are issues with the database connection.
         """
-        self.connection = DBManager().get_db_connection()
-        query = f"DELETE FROM {self.table} WHERE {pk} = {id_to_delete}"
-        cursor = self.connection.cursor()
-        cursor.execute(query)
-        return True
+        try:
+            self.connection = DBManager().get_db_connection()
+            query = f"DELETE FROM {self.table} WHERE {pk} = {id_to_delete}"
+            LOGGER.info(query)
+            cursor = self.connection.cursor()
+            cursor.execute(query)
+            self.connection.commit()
+            return True
+        except Exception as e:
+            LOGGER.error(f"Error deleting record: {e}")
+            return False
