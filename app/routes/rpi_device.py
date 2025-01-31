@@ -7,6 +7,7 @@ from flask import jsonify
 from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import DeviceSchema
 from app.dao.rpi_dao import DeviceDAO
+from app.services.rpi_device_controller import DeviceController
 
 # Blueprint
 rpi_device_bp = Blueprint('rpi_device', __name__, description="Blueprint dedicated to Raspberry Pi Device operations.")
@@ -72,4 +73,20 @@ class DeviceCrud(MethodView):
         result = DeviceDAO().update_device(device_id, request)
         if result:
             return {"success": True}, 200
+        return {"message": "Device not found"}, 404
+
+@rpi_device_bp.route("/rpi/device/<int:device_id>/read")
+class DeviceRead(MethodView):
+    @rpi_device_bp.response(200, dict, description="Device data successfully read.")
+    @rpi_device_bp.doc(summary="Read device data", description="Read data for a specific device ID.")
+    def get(self, device_id:int):
+        """
+        GET method: Read data for a specific device ID.
+        """
+        device = DeviceDAO().get_device(device_id)
+        if device:
+            controller = DeviceController(device)
+            value = controller.read_device()
+            DeviceDAO().update_device(device_id, {"value": value})
+            return {value}, 200
         return {"message": "Device not found"}, 404
