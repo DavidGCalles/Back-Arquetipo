@@ -17,7 +17,7 @@ class DeviceController:
     def write_device(self, state:str):
         pass
     def determine_device(self):
-        if self.data["model"] == "D18B20":
+        if self.data["model"] == "DS18B20":
             instances= W1ThermSensor.get_available_sensors()
             LOGGER.info(f"Available sensors: {instances}")
             #one line, filter the proper instance by id with bus_id
