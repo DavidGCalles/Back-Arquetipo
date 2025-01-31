@@ -87,6 +87,5 @@ class DeviceRead(MethodView):
         if device:
             controller = DeviceController(device)
             value = controller.read_device()
-            DeviceDAO().update_device(device_id, {"value": value})
-            return {value}, 200
-        return {"message": "Device not found"}, 404
+            return jsonify(value), 200
+        return jsonify({"message": "Device not found"}), 404

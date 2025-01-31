@@ -10,6 +10,7 @@ class DeviceController:
             result = self.sensor_instance.get_temperature("celsius")
             LOGGER.info(f"Temperature read: {result} and type: {type(result)}")
             return self.sensor_instance.get_temperature("celsius")
+        return {}
     def write_device(self, state:str):
         pass
     def determine_device(self):
