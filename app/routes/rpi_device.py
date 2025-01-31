@@ -79,15 +79,22 @@ class DeviceCrud(MethodView):
 @rpi_device_bp.route("/rpi/device/<int:device_id>/read")
 class DeviceRead(MethodView):
     @rpi_device_bp.response(200, description="Device data successfully read.")
+    @rpi_device_bp.response(404, description="Device not found.")
     @rpi_device_bp.doc(summary="Read device data", description="Read data for a specific device ID.")
     def get(self, device_id:int):
         """
         GET method: Read data for a specific device ID.
         """
-        device = DeviceDAO().get_device(device_id)
-        LOGGER.info(f"Device: {device}")
-        if device:
-            controller = DeviceController(device)
-            value = controller.read_device()
-            return jsonify(value), 200
-        return jsonify({"message": "Device not found"}), 404
+        try:
+            device = DeviceDAO().get_device(device_id)
+            if device:
+                controller = DeviceController(device)
+                value = controller.read_device()
+                DeviceDAO().update_device(device_id, {"value": value})
+                return jsonify(value), 200
+            else:
+                raise KeyError("Device not found")
+        except KeyError as e:
+            return jsonify({"message": "Device not found", "detail":e}), 404
+        except NameError as e:
+            return jsonify({"message": "Device not found", "detail": e}), 404
