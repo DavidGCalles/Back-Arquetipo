@@ -15,4 +15,4 @@ class DeviceController:
         pass
     def determine_device(self):
         if self.data["model"] == "D18B20":
-            return W1ThermSensor(self.data["pin_number"])
+            return W1ThermSensor(self.data["bus_id"])
