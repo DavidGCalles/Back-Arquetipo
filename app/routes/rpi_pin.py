@@ -96,6 +96,7 @@ class PinControl(MethodView):
         """
         POST method: Control a specific pin number.
         """
+        LOGGER.info("request dict: %s",request)
         pin_number = request["pin_number"]
         state = request["state"]
         cao = GPIOControlCAO()
