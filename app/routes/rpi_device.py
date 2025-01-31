@@ -77,7 +77,7 @@ class DeviceCrud(MethodView):
 
 @rpi_device_bp.route("/rpi/device/<int:device_id>/read")
 class DeviceRead(MethodView):
-    @rpi_device_bp.response(200, dict, description="Device data successfully read.")
+    @rpi_device_bp.response(200, description="Device data successfully read.")
     @rpi_device_bp.doc(summary="Read device data", description="Read data for a specific device ID.")
     def get(self, device_id:int):
         """
