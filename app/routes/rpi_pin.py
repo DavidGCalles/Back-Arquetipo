@@ -5,8 +5,9 @@ from flask_smorest import Blueprint
 from flask.views import MethodView
 from flask import jsonify
 from app.models.demo_schemas import MessageResponseSchema
-from app.models.rpi_schemas import PinSchema
+from app.models.rpi_schemas import PinSchema, PinControlSchema
 from app.dao.rpi_dao import GPIOControlDAO
+from app.services.rpi_cao import GPIOControlCAO
 from config import LOGGER
 
 # Blueprint
@@ -81,4 +82,24 @@ class PinCrud(MethodView):
         result = GPIOControlDAO().delete_pin(pin_number)
         if result:
             return {"message": "Pin successfully deleted"}, 200
+        return {"message": "Pin not found"}, 404
+
+@rpi_pin_bp.route("/rpi/pin/control")
+class PinControl(MethodView):
+    """
+    PinControl: Class to manage control operations for a specific pin item.
+    """
+    @rpi_pin_bp.arguments(PinControlSchema)
+    @rpi_pin_bp.response(200, MessageResponseSchema, description="Pin control operation successfully executed.")
+    @rpi_pin_bp.doc(summary="Control pin", description="Control a specific pin number.")
+    def post(self, request):
+        """
+        POST method: Control a specific pin number.
+        """
+        pin_number = request["pin_number"]
+        state = request["state"]
+        cao = GPIOControlCAO()
+        cao.setup_pin(pin_number, "OUTPUT")
+        if cao.write_pin(pin_number, state):
+            return {"message": "Pin controlled"}, 200
         return {"message": "Pin not found"}, 404

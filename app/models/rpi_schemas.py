@@ -23,6 +23,10 @@ class PinSchema(BaseSchema):
     object_type = fields.Str(validate=lambda x: x in ['SENSOR', 'ACTUATOR', 'OTHER'],
                              metadata={"description": "Pin object type: SENSOR, ACTUATOR, OTHER"})
 
+class PinControlSchema(BaseSchema):
+    pin_number = fields.Int(required=True, metadata={"description": "Pin number"})
+    state = fields.Str(validate=lambda x: x in ['HIGH', 'LOW'])
+
 class DeviceSchema(BaseSchema):
     """
     DeviceSchema: Class to manage the schema of the devices.
@@ -46,3 +50,5 @@ class DeviceSchema(BaseSchema):
     measure_unit = fields.Str(metadata={"description": "Measurement unit of the device"})
     last_used = fields.DateTime(metadata={"description": "Last used date of the device"})
     value = fields.Str(metadata={"description": "Value of the device"})
+
+
