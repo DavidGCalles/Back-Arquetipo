@@ -8,6 +8,7 @@ from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import DeviceSchema
 from app.dao.rpi_dao import DeviceDAO
 from app.services.rpi_device_controller import DeviceController
+from config import LOGGER
 
 # Blueprint
 rpi_device_bp = Blueprint('rpi_device', __name__, description="Blueprint dedicated to Raspberry Pi Device operations.")
@@ -84,6 +85,7 @@ class DeviceRead(MethodView):
         GET method: Read data for a specific device ID.
         """
         device = DeviceDAO().get_device(device_id)
+        LOGGER.info(f"Device: {device}")
         if device:
             controller = DeviceController(device)
             value = controller.read_device()

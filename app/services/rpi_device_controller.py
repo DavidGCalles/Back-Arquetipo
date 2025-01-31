@@ -4,6 +4,7 @@ from time import sleep
 
 class DeviceController:
     def __init__(self, data:dict):
+        LOGGER.info(f"Data: {data}")
         self.data = data
         self.sensor_instance = self.determine_device()
         LOGGER.info(f"Sensor instance: {self.sensor_instance}")
@@ -18,6 +19,8 @@ class DeviceController:
     def determine_device(self):
         if self.data["model"] == "D18B20":
             instances= W1ThermSensor.get_available_sensors()
+            LOGGER.info(f"Available sensors: {instances}")
             #one line, filter the proper instance by id with bus_id
             proper_instance = next((x for x in instances if x.id == self.data["bus_id"]), None)
+            LOGGER.info(f"Proper instance: {proper_instance}")
             return proper_instance
