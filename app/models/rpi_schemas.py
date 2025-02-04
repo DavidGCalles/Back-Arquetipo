@@ -25,7 +25,7 @@ class PinSchema(BaseSchema):
 
 class PinControlSchema(BaseSchema):
     pin_number = fields.Int(required=True, metadata={"description": "Pin number"})
-    state = fields.Str(validate=lambda x: x in ['HIGH', 'LOW'])
+    state = fields.Str(validate=lambda x: x in ['HIGH', 'LOW'], metadata={"description": "Status desired: HIGH, LOW"})
 
 class DeviceSchema(BaseSchema):
     """

@@ -3,11 +3,12 @@ from app.services.rpi_cao import GPIOControlCAO
 
 class GPIOController:
     def __init__(self):
-        self.dao = GPIOControlDAO()
+        #self.dao = GPIOControlDAO()
         self.cao = GPIOControlCAO()
 
     def _setup_pins_from_db(self):
-        pins = self.dao.get_all_pins()
+        dao = GPIOControlDAO()
+        pins = dao.get_all_pins()
         for pin in pins:
             pin_number = pin["pin_number"]
             mode = pin["mode"]
@@ -27,7 +28,8 @@ class GPIOController:
         pin_number = pin_data["pin_number"]
         mode = pin_data["mode"]
         pull = pin_data["pull"] if pin_data["pull"] != "NONE" else None
-        if self.cao.setup_pin(pin_number, mode, pull) and self.dao.insert_or_ignore(pin_data):
+        dao = GPIOControlDAO()
+        if self.cao.setup_pin(pin_number, mode, pull) and dao.insert_or_ignore(pin_data):
             return True
         return False
 

@@ -1,6 +1,7 @@
 """This module stores all config strings and details needed to run the app"""
 import logging
 import os
+from app.services.rpi_gpio_controller import GPIOController
 #from secrets_file import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 class Config:
@@ -53,3 +54,7 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 LOGGER.addHandler(handler)
+
+# Setup controller IF env variable is true
+if os.getenv("RPI_MODULE"):
+    GPIOCONTROLLER = GPIOController()

@@ -7,8 +7,7 @@ from flask import jsonify
 from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import PinSchema, PinControlSchema
 from app.dao.rpi_dao import GPIOControlDAO
-from app.services.rpi_cao import GPIOControlCAO
-from config import LOGGER
+from config import LOGGER, GPIOCONTROLLER
 
 # Blueprint
 rpi_pin_bp = Blueprint('rpi_pin', __name__, description="Blueprint dedicated to Raspberry Pi PIN operations.")
@@ -99,8 +98,7 @@ class PinControl(MethodView):
         LOGGER.info("request dict: %s",request)
         pin_number = request["pin_number"]
         state = request["state"]
-        cao = GPIOControlCAO()
-        cao.setup_pin(pin_number, "OUTPUT")
-        if cao.write_pin(pin_number, state):
+        GPIOCONTROLLER.setup_pin(pin_number, "OUTPUT")
+        if GPIOCONTROLLER.write_pin(pin_number, state):
             return {"message": "Pin controlled"}, 200
         return {"message": "Pin not found"}, 404
