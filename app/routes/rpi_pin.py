@@ -41,6 +41,26 @@ class PinCollection(MethodView):
             return {"message": "New pin inserted"}, 201
         return {"message": "There was a problem inserting the pin"}, 503
 
+@rpi_pin_bp.route("/rpi/pin/set_up_from_db")
+class PinSetup(MethodView):
+    @rpi_pin_bp.response(200, PinSchema, description="Pin data successfully retrieved and set up.", many=True)
+    @rpi_pin_bp.doc(summary="Retrieve the pins from db and set them up", description="Retrieve the pins from db and set them up")
+    def get():
+        pins_data = GPIOControlDAO().get_all_pins()
+        try:
+            for pin_dict in pins_data:
+                GPIOCAO.setup_pin(pin_dict["pin_number"],
+                                pin_dict["mode"],
+                                pin_dict["pull"],
+                                pin_dict["state"])
+        except Exception as e:
+            LOGGER.error("Problem mounting pins")
+            return jsonify({"message": "Error setting up pins from db"}), 404
+        return jsonify({"message": "All pins set up", "data": pins_data}), 200
+            
+
+
+
 @rpi_pin_bp.route("/rpi/pin/<int:pin_number>")
 class PinCrud(MethodView):
     """
@@ -94,12 +114,25 @@ class PinControl(MethodView):
     @rpi_pin_bp.doc(summary="Control pin", description="Control a specific pin number.")
     def post(self, request):
         """
-        POST method: Control a specific pin number.
+        POST method: Control a specific pin number. Pin needs to be registered as OUTPUT TO WORK
         """
         LOGGER.info("request dict: %s",request)
         pin_number = request["pin_number"]
         state = request["state"]
+        pin_data = None
+        try:
+            pin_data = GPIOControlDAO().get_pin(pin_number)[0]
+        except IndexError as e:
+            return {"message": "Pin not registered"},404
+
+        if pin_data["mode"] != "OUTPUT":
+            return {"message": "Pin not configured as OUTPUT"}, 404
+        
+        if pin_data["state"] == state:
+            return {"message": f"Pin already in state: {state}"}, 200
+
         GPIOCAO.setup_pin(pin_number, "OUTPUT")
         if GPIOCAO.write_pin(pin_number, state):
+            GPIOControlDAO().update_pin(pin_number, "state")
             return {"message": "Pin controlled"}, 200
         return {"message": "Pin not found"}, 404
