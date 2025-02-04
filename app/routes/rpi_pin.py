@@ -121,7 +121,7 @@ class PinControl(MethodView):
         state = request["state"]
         pin_data = None
         try:
-            pin_data = GPIOControlDAO().get_pin(pin_number)[0]
+            pin_data = GPIOControlDAO().get_pin(pin_number)
         except IndexError as e:
             return {"message": "Pin not registered"},404
 
