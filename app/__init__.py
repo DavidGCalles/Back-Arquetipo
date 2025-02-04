@@ -12,6 +12,7 @@ from app.routes.rpi import rpi_bp
 from app.routes.rpi_pin import rpi_pin_bp
 from app.routes.rpi_device import rpi_device_bp
 from app.services.db import DBManager
+from config import Config
 
 
 def create_app():
