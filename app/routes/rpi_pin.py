@@ -43,7 +43,7 @@ class PinCollection(MethodView):
 
 @rpi_pin_bp.route("/rpi/pin/set_up_from_db")
 class PinSetup(MethodView):
-    @rpi_pin_bp.response(200, PinSchema, description="Pin data successfully retrieved and set up.", many=True)
+    @rpi_pin_bp.response(200, PinSchema, description="Pin data successfully retrieved and set up.")
     @rpi_pin_bp.doc(summary="Retrieve the pins from db and set them up", description="Retrieve the pins from db and set them up")
     def get():
         pins_data = GPIOControlDAO().get_all_pins()
