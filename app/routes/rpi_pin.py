@@ -45,7 +45,7 @@ class PinCollection(MethodView):
 class PinSetup(MethodView):
     @rpi_pin_bp.response(200, PinSchema, description="Pin data successfully retrieved and set up.")
     @rpi_pin_bp.doc(summary="Retrieve the pins from db and set them up", description="Retrieve the pins from db and set them up")
-    def get():
+    def get(self):
         pins_data = GPIOControlDAO().get_all_pins()
         try:
             for pin_dict in pins_data:
