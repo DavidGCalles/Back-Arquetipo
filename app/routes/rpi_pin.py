@@ -133,6 +133,6 @@ class PinControl(MethodView):
 
         GPIOCAO.setup_pin(pin_number, "OUTPUT")
         if GPIOCAO.write_pin(pin_number, state):
-            GPIOControlDAO().update_pin(pin_number, "state")
+            GPIOControlDAO().update_pin(pin_number, {"state": state})
             return {"message": "Pin controlled"}, 200
         return {"message": "Pin not found"}, 404
