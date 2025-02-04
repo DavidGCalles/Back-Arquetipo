@@ -3,6 +3,12 @@ from os import urandom, environ
 
 app = create_app()
 app.secret_key = urandom(24)
+GPIOCONTROLLER = None
+
+if environ.get("RPI_MODULE"):
+    from app.services.rpi_gpio_controller import GPIOController
+    GPIOCONTROLLER = GPIOController()
+
 
 if __name__ == "__main__":
     port = int(environ.get("PORT", 5000))

@@ -7,7 +7,8 @@ from flask import jsonify
 from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import PinSchema, PinControlSchema
 from app.dao.rpi_dao import GPIOControlDAO
-from config import LOGGER, GPIOCONTROLLER
+from config import LOGGER
+from run import GPIOCONTROLLER
 
 # Blueprint
 rpi_pin_bp = Blueprint('rpi_pin', __name__, description="Blueprint dedicated to Raspberry Pi PIN operations.")
