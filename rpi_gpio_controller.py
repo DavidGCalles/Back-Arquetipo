@@ -1,5 +1,5 @@
-from app.dao.rpi_dao import GPIOControlDAO
-from app.services.rpi_cao import GPIOControlCAO
+#from app.dao.rpi_dao import GPIOControlDAO
+from rpi_cao import GPIOControlCAO
 
 class GPIOController:
     def __init__(self):
@@ -7,7 +7,8 @@ class GPIOController:
         self.cao = GPIOControlCAO()
 
     def _setup_pins_from_db(self):
-        dao = GPIOControlDAO()
+        #dao = GPIOControlDAO()
+        dao = None
         pins = dao.get_all_pins()
         for pin in pins:
             pin_number = pin["pin_number"]
