@@ -12,7 +12,8 @@ from app.routes.rpi import rpi_bp
 from app.routes.rpi_pin import rpi_pin_bp
 from app.routes.rpi_device import rpi_device_bp
 from app.services.db import DBManager
-from config import Config
+from app.services.rpi_gpio_controller import GPIOController
+from config import Config, GPIOCONTROLLER
 
 
 def create_app():
@@ -48,5 +49,6 @@ def create_app():
         sqlite_manager = DBManager()
         sqlite_manager.reset_db_settings("sqlite-rpi")
         sqlite_manager.check_coherence()
+        GPIOCONTROLLER = GPIOController()
     DBManager().check_coherence()
     return app
