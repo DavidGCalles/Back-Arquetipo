@@ -111,6 +111,8 @@ class PinControl(MethodView):
     """
     @rpi_pin_bp.arguments(PinControlSchema)
     @rpi_pin_bp.response(200, MessageResponseSchema, description="Pin control operation successfully executed.")
+    @rpi_pin_bp.response(404, MessageResponseSchema, description="Pin not registered")
+    @rpi_pin_bp.response(404, MessageResponseSchema, description="Pin not configured as OUTPUT")
     @rpi_pin_bp.doc(summary="Control pin", description="Control a specific pin number.")
     def post(self, request):
         """
