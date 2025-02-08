@@ -10,15 +10,17 @@
     <button onclick="getDevices()">Fetch Data</button>
     <div id="output">
         <!-- Output will be displayed here -->
-
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            getDevices();
+        });
+
         function getDevices(){
             fetch('http://192.168.1.51:5000/rpi/device')
                 .then(response => response.json())
                 .then(data => {
-                    //document.getElementById('output').innerText = JSON.stringify(data, null, 2);
                     data.forEach(device => {
                         const card = crearCartaComponente(device);
                         document.getElementById('output').appendChild(card);
@@ -31,8 +33,8 @@
             const card = document.createElement('div');
             card.classList.add('card');
             card.innerHTML = `
-                <h2>${data.device_id}</h2>
-                <p>${data.name}</p>
+                <h2>${data.name}</h2>
+                <p>${data.device_id}</p>
             `;
             return card;
         }
