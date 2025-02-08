@@ -76,7 +76,7 @@
         }
 
         function readDevice(deviceId){
-            fetch(`http://192.168.1.51:5000/rpi/device/${deviceId}`)
+            fetch(`http://192.168.1.51:5000/rpi/device/${deviceId}/read`)
                 .then(response => response.json())
                 .then(data => {
                     actualizarCartaComponente(data);
