@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documento HTML Básico</title>
+</head>
+<body>
+    <h1>Hola, Mundo!</h1>
+    <button id="fetchButton">Fetch Data</button>
+    <div id="output">
+        <!-- Output will be displayed here -->
+    </div>
+
+    <script>
+        document.getElementById('fetchButton').addEventListener('click', () => {
+            fetch('http://192.168.1.51:5000/rpi/device')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+</body>
+</html>
