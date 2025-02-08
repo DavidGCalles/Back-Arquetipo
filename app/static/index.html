@@ -52,7 +52,7 @@
         }
 
         function getSingleDevice(device_id){
-            fetch(`https://192.168.1.51:5000/rpi/device/${device_id}`)
+            fetch(`http://192.168.1.51:5000/rpi/device/${device_id}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
