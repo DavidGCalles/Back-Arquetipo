@@ -59,9 +59,16 @@
             card.children[1].innerHTML = '';
             Object.keys(data).forEach(key => {
                 if(key !== 'device_id' && key !== 'name'){
-                    card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
+                    card.children[1].innerHTML += `<p class="card-text" id="${data.device_id}_${key}">${key}: ${data[key]}</p>`;
                 }
             });
+        }
+
+        function actualizarValorCartaComponente(device_id, key, value){
+            //Se busca key en card.children[1] y se actualiza su valor
+            const element = document.getElementById(`${device_id}_${key}`);
+            element.innerHTML = `${key}: ${value}`;
+
         }
 
         function getSingleDevice(device_id){
@@ -79,7 +86,7 @@
             fetch(`http://192.168.1.51:5000/rpi/device/${deviceId}/read`)
                 .then(response => response.json())
                 .then(data => {
-                    actualizarCartaComponente(data);
+                    actualizarValorCartaComponente(deviceId, "value", data);
                 })
                 .catch(error => console.error('Error fetching device data:', error));
         }
