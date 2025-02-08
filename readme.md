@@ -79,7 +79,9 @@ This will create the cloud build trigger and the cloud run function as service.
 
 2. DATABASE_TYPE: This variable determines what set of variables your instance will get to connect to the database. It defaults to "sqlite". Docker compose sets it up to the db container.
 
-3. RPI_MODULE: In this moment, setting up this variable loads RPI blueprint for control. Value? Whatever you want, its not used
+3. FLASK_ENV: This allows the app to know what origins have to allow
+
+4. RPI_MODULE: In this moment, setting up this variable loads RPI blueprint for control. Value? Whatever you want, its not used
 
 ## Testing
 Execute this commands in the root folder.

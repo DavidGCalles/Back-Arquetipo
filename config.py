@@ -1,10 +1,11 @@
 """This module stores all config strings and details needed to run the app"""
 import logging
+import os
 #from secrets_file import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 class Config:
     """Stores every config detail needed"""
-    FLASK_ENV = None
+    FLASK_ENV = os.getenv("FLASK_ENV", "development")
     SECRET_KEY = 'your_secret_key'  # Replace with your actual secret key
     SWAGGER = {
         'title': 'Flask API',
@@ -43,7 +44,6 @@ class Config:
         "TOKEN_URI" : 'https://accounts.google.com/o/oauth2/token',
         "SCOPE" : ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/calendar']
     }
-
 
 # Setup logger
 LOGGER = logging.getLogger(__name__)
