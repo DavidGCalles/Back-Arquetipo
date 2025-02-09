@@ -78,7 +78,12 @@
         function actualizarValorCartaComponente(device_id, key, value){
             //Se busca key en card.children[1] y se actualiza su valor
             const element = document.getElementById(`${device_id}_${key}`);
-            element.innerHTML = `${key}: ${value}`;
+            try{
+               element.innerHTML = `${key}: ${value}`; 
+            }catch(error){
+                console.error('Error updating card value:', error);
+            }
+            
 
         }
 
@@ -153,15 +158,35 @@
                     if(data["mode"] == "OUTPUT" && key == "state"){
                         //crear boton ON/OFF
                         card.children[1].innerHTML += `
-                            <button type="button" class="btn btn-success">ON</button>
-                            <button type="button" class="btn btn-danger">OFF</button>
+                            <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
+                            <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
                         `;
                     }else{
                         card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
                     }
                 }
             });
+        }
 
+        function sendPostRequest(pin_number, state) {
+            let data = {
+                "pin_number": pin_number,
+                "state": state
+            };
+            fetch(`http://192.168.1.51:5000/rpi/pin/control`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>
