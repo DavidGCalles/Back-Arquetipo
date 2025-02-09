@@ -11,4 +11,3 @@ rpi.db*
 .coverage
 coverage.lcov
 .vscode/
-Backend.code-workspace
