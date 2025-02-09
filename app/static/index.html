@@ -155,16 +155,17 @@
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        // 
-        function actualizarCartaPin(data){
-            const card = document.getElementById(`pin_${data.pin_number}`);
-            card.children[1].innerHTML = '';
-            let objKeys = Object.keys(data)
-            objKeys.forEach(key => {
-                if(key == 'protocol' || key == 'pull'){
-                    card.children[1].innerHTML += `<p class="card-text" id="pin_${data.pin_number}_${key}">${key}: ${data[key]}</p>`;
-                }
-            });
+        function actualizarValorCartaPin(pin_number, key, value){
+            const element = document.getElementById(`pin_${pin_number}_${key}`);
+            if(element == null){
+                const parentElement = document.getElementById('pin_' + pin_number);
+                let newElement = document.createElement('p');
+                newElement.classList.add('card-text');
+                newElement.innerHTML = `${key}: ${value}`;
+                parentElement.appendChild(newElement);
+            }else{
+                element.innerHTML = `${key}: ${value}`;
+            }
         }
 
         function sendPostRequest(pin_number, state) {
