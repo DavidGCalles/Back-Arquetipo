@@ -131,16 +131,17 @@
                     <div class="card-body">
                         <p class="card-text">Mode: ${data.mode}</p>
                         <p class="card-text">State: ${data.state}</p>
-                    </div>
-                </div>
             `;
             if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
                 card.innerHTML += `
                     <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
                     <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
-
                 `;
             }
+            card.innerHTML += `
+                    </div>
+                </div>
+            `;
             return card;
         }
 
