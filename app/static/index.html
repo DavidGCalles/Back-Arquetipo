@@ -135,7 +135,7 @@
                 </div>
             `;
             if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
-                card.children[1].innerHTML += `
+                card.innerHTML += `
                     <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
                     <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
 
@@ -161,7 +161,7 @@
             card.children[1].innerHTML = '';
             let objKeys = Object.keys(data)
             objKeys.forEach(key => {
-                if(key == 'protocol' || key == 'object_typle' || key == 'pull'){
+                if(key == 'protocol' || key == 'pull'){
                     card.children[1].innerHTML += `<p class="card-text" id="pin_${data.pin_number}_${key}">${key}: ${data[key]}</p>`;
                 }
             });
