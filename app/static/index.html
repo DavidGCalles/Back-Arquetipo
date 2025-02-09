@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPI Board Control</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <h1 class="my-4 jumbotron">RPI Board Control</h1>
+    <div class="card" id="devicesContainer">
+        <div class="card-header">
+            <h5 class="card-title">Devices</h5>
+        </div>
+        <div class="card-body">
+            <div id="outputDevices" class="row">   
+            <!-- Output will be displayed here -->
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="card" id="pinContainer">
+        <div class="card-header">
+            <h5 class="card-title">Pin Control</h5>
+        </div>
+        <div class="card-body"> 
+            <div id="outputPin" class="row">
+                <!-- Output will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            getDevices();
+        });
+        document.addEventListener('DOMContentLoaded', (event) => {
+            getPin();
+        });
+
+        function getDevices(){
+            fetch('http://192.168.1.51:5000/rpi/device')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(device => {
+                        const card = crearCartaComponente(device);
+                        document.getElementById('outputDevices').appendChild(card);
+                        setInterval(() => readDevice(device.device_id), 45000);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function crearCartaComponente(data){
+            const card = document.createElement('div');
+            card.classList.add('col-md-3', 'mb-3');
+            card.innerHTML = `
+                <div class="card" id="${data.device_id}" onclick="getSingleDevice(${data.device_id})">
+                    <div class="card-header">
+                        <h5 class="card-title">${data.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">ID: ${data.device_id}</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text" id="${data.device_id}_value">value: ${data.value}</p>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function actualizarCartaComponente(data){
+            const card = document.getElementById(data.device_id);
+            card.children[1].innerHTML = '';
+            Object.keys(data).forEach(key => {
+                if(key !== 'device_id' && key !== 'name'){
+                    card.children[1].innerHTML += `<p class="card-text" id="${data.device_id}_${key}">${key}: ${data[key]}</p>`;
+                }
+            });
+        }
+
+        function actualizarValorCartaComponente(device_id, key, value){
+            //Se busca key en card.children[1] y se actualiza su valor
+            try{
+                const element = document.getElementById(`${device_id}_${key}`);
+               element.innerHTML = `${key}: ${value}`; 
+            }catch(error){
+                console.error('Error updating card value:', error);
+            }
+            
+
+        }
+
+        function getSingleDevice(device_id){
+            fetch(`http://192.168.1.51:5000/rpi/device/${device_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    //Modificamos el DOM de la carta correspondiente
+                    actualizarCartaComponente(data);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function readDevice(deviceId){
+            fetch(`http://192.168.1.51:5000/rpi/device/${deviceId}/read`)
+                .then(response => response.json())
+                .then(data => {
+                    actualizarValorCartaComponente(deviceId, "value", data);
+                })
+                .catch(error => console.error('Error fetching device data:', error));
+        }
+
+        function getPin(){
+            fetch('http://192.168.1.51:5000/rpi/pin')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(pin => {
+                        const card = crearCartaPin(pin);
+                        document.getElementById('outputPin').appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function crearCartaPin(data){
+            const card = document.createElement('div');
+            card.classList.add('col-md-4', 'mb-4');
+            let htmlFinal = `
+                <div class="card" id="pin_${data.pin_number}" onclick="getSinglePin(${data.pin_number})">
+                    <div class="card-header">
+                        <h5 class="card-title">Pin ${data.pin_number}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${data.name}</h6>
+                    </div>
+                    <div class="card-body">`;
+            if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
+                htmlFinal += `
+                        <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
+                        <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>`;
+            }
+            htmlFinal += `
+                        <p class="card-text" id="pin_${data.pin_number}_mode">mode: ${data.mode}</p>
+                        <p class="card-text" id="pin_${data.pin_number}_state">state: ${data.state}</p>
+                    </div>
+                </div>
+            `;
+            card.innerHTML = htmlFinal;
+            return card;
+        }
+
+        function getSinglePin(pin_number){
+            fetch(`http://192.168.1.51:5000/rpi/pin/${pin_number}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    //Modificamos el DOM de la carta correspondiente
+                    actualizarValorCartaPin(pin_number, data)
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function actualizarValorCartaPin(pin_number, data){
+            Object.keys(data).forEach(key => {
+                if(key !== 'pin_number' && key !== 'name'){
+                    const element = document.getElementById(`pin_${pin_number}_${key}`);
+                    if(element == null){
+                        const parentElement = document.getElementById('pin_' + pin_number).children[1];
+                        let newElement = document.createElement('p');
+                        newElement.classList.add('card-text');
+                        newElement.id = `pin_${pin_number}_${key}`;
+                        newElement.innerHTML = `${key}: ${data[key]}`;
+                        parentElement.appendChild(newElement);
+                    }else{
+                        element.innerHTML = `${key}: ${data[key]}`;
+                    }
+                }
+            });
+        }
+
+        function sendPostRequest(pin_number, state) {
+            let data = {
+                "pin_number": pin_number,
+                "state": state
+            };
+            fetch(`http://192.168.1.51:5000/rpi/pin/control`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
