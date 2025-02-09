@@ -135,8 +135,8 @@
                         <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>`;
             }
             htmlFinal += `
-                        <p class="card-text">Mode: ${data.mode}</p>
-                        <p class="card-text">State: ${data.state}</p>
+                        <p class="card-text" id="pin_${data.pin_number}_mode">mode: ${data.mode}</p>
+                        <p class="card-text" id="pin_${data.pin_number}_state">state: ${data.state}</p>
                     </div>
                 </div>
             `;
@@ -160,9 +160,10 @@
                 if(key !== 'pin_number' && key !== 'name'){
                     const element = document.getElementById(`pin_${pin_number}_${key}`);
                     if(element == null){
-                        const parentElement = document.getElementById('pin_' + pin_number);
+                        const parentElement = document.getElementById('pin_' + pin_number).children[1];
                         let newElement = document.createElement('p');
                         newElement.classList.add('card-text');
+                        newElement.id = `pin_${pin_number}_${key}`;
                         newElement.innerHTML = `${key}: ${data[key]}`;
                         parentElement.appendChild(newElement);
                     }else{
