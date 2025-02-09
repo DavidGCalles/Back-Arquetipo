@@ -122,26 +122,25 @@
         function crearCartaPin(data){
             const card = document.createElement('div');
             card.classList.add('col-md-4', 'mb-4');
-            card.innerHTML = `
+            let htmlFinal = `
                 <div class="card" id="pin_${data.pin_number}" onclick="getSinglePin(${data.pin_number})">
                     <div class="card-header">
                         <h5 class="card-title">Pin ${data.pin_number}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${data.name}</h6>
                     </div>
-                    <div class="card-body">
-            `;
+                    <div class="card-body">`;
             if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
-                card.innerHTML += `
+                htmlFinal += `
                         <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
-                        <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
-                `;
+                        <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>`;
             }
-            card.innerHTML += `
+            htmlFinal += `
                         <p class="card-text">Mode: ${data.mode}</p>
                         <p class="card-text">State: ${data.state}</p>
                     </div>
                 </div>
             `;
+            card.innerHTML = htmlFinal;
             return card;
         }
 
@@ -159,7 +158,7 @@
         // 
         function actualizarCartaPin(data){
             const card = document.getElementById(`pin_${data.pin_number}`);
-            card.children[2].innerHTML = '';
+            card.children[1].innerHTML = '';
             let objKeys = Object.keys(data)
             objKeys.forEach(key => {
                 if(key == 'protocol' || key == 'pull'){
