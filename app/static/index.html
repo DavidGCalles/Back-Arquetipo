@@ -60,7 +60,7 @@
 
         function crearCartaComponente(data){
             const card = document.createElement('div');
-            card.classList.add('col');
+            card.classList.add('col-md-3', 'mb-3');
             card.innerHTML = `
                 <div class="card" id="${data.device_id}" onclick="getSingleDevice(${data.device_id})">
                     <div class="card-header">
