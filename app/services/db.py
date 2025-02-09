@@ -34,7 +34,7 @@ class DBManager:
             try:
                 conn = self.get_db_connection()
                 cur = conn.cursor()
-                ddl_path = self.project_root / Config.DDL_RPI_NAME
+                ddl_path = self.project_root / Config.RPI_MIDDLEWARE_SETTINGS["DDL_RPI_NAME"]
                 LOGGER.info("Cargando ddl-rpi")
                 with open(ddl_path, 'r', encoding="UTF-8") as file:
                     sql_script = file.read()
