@@ -151,18 +151,10 @@
             objKeys.forEach(key => {
                 if(key !== 'pin_number' && key !== 'name'){
                     if(data["mode"] == "OUTPUT" && key == "state"){
-                        let estadoInicial;
-                        if(data["state"] == "LOW"){
-                            estadoInicial = "no"
-                        }else{
-                            estadoInicial = "yes"
-                        }
                         //crear boton ON/OFF
                         card.children[1].innerHTML += `
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="${data.pin_number}_buttonOnOff" name="buttonOnOff" value="${estadoInicial}" checked>
-                                <label class="form-check-label" for="${data.pin_number}_buttonOnOff">OFF/ON</label>
-                            </div>
+                            <button type="button" class="btn btn-success">ON</button>
+                            <button type="button" class="btn btn-danger">OFF</button>
                         `;
                     }else{
                         card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
