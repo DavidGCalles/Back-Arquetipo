@@ -118,7 +118,7 @@
             const card = document.createElement('div');
             card.classList.add('col-md-4', 'mb-4');
             card.innerHTML = `
-                <div class="card" id="${data.pin_number}" onclick="getSinglePin(${data.pin_number})">
+                <div class="card" id="pin_${data.pin_number}" onclick="getSinglePin(${data.pin_number})">
                     <div class="card-header">
                         <h5 class="card-title">Pin ${data.pin_number}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${data.name}</h6>
@@ -145,7 +145,7 @@
 
         // 
         function actualizarCartaPin(data){
-            const card = document.getElementById(data.pin_number);
+            const card = document.getElementById(`pin_${data.pin_number}`);
             card.children[1].innerHTML = '';
             Object.keys(data).forEach(key => {
                 if(key !== 'pin_number' && key !== 'name'){
