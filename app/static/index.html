@@ -77,8 +77,8 @@
 
         function actualizarValorCartaComponente(device_id, key, value){
             //Se busca key en card.children[1] y se actualiza su valor
-            const element = document.getElementById(`${device_id}_${key}`);
             try{
+                const element = document.getElementById(`${device_id}_${key}`);
                element.innerHTML = `${key}: ${value}`; 
             }catch(error){
                 console.error('Error updating card value:', error);
@@ -134,6 +134,13 @@
                     </div>
                 </div>
             `;
+            if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
+                card.children[1].innerHTML += `
+                    <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
+                    <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
+
+                `;
+            }
             return card;
         }
 
@@ -154,16 +161,8 @@
             card.children[1].innerHTML = '';
             let objKeys = Object.keys(data)
             objKeys.forEach(key => {
-                if(key !== 'pin_number' && key !== 'name'){
-                    if(data["mode"] == "OUTPUT" && key == "state"){
-                        //crear boton ON/OFF
-                        card.children[1].innerHTML += `
-                            <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
-                            <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
-                        `;
-                    }else{
-                        card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
-                    }
+                if(key == 'protocol' || key == 'object_typle' || key == 'pull'){
+                    card.children[1].innerHTML += `<p class="card-text" id="pin_${data.pin_number}_${key}">${key}: ${data[key]}</p>`;
                 }
             });
         }
