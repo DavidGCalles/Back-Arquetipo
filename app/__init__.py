@@ -8,7 +8,7 @@ from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
 from app.routes.demo_crud import crud_bp
-#from app.routes.rpi import rpi_bp
+from app.routes.middleware.rpi import rpi_bp
 #from app.routes.rpi_pin import rpi_pin_bp
 #from app.routes.rpi_device import rpi_device_bp
 from app.services.db import DBManager
@@ -42,7 +42,7 @@ def create_app():
     api.register_blueprint(main_bp)
     api.register_blueprint(crud_bp)
     if os.getenv("RPI_MODULE"):
-        #api.register_blueprint(rpi_bp)
+        api.register_blueprint(rpi_bp)
         #api.register_blueprint(rpi_pin_bp)
         #api.register_blueprint(rpi_device_bp)
         sqlite_manager = DBManager()

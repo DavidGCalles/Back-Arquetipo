@@ -11,3 +11,4 @@ rpi.db*
 .coverage
 coverage.lcov
 .vscode/
+app/routes/middleware/__pycache__/rpi.c*
