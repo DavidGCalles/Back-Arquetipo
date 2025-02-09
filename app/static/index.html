@@ -9,18 +9,18 @@
 </head>
 <body>
     <h1 class="my-4 jumbotron">RPI Board Control</h1>
-    <div class="card" id="devicesContainer" style="width: 100%">
+    <div class="card" id="devicesContainer">
         <div class="card-header">
             <h5 class="card-title">Devices</h5>
         </div>
         <div class="card-body">
-            <div id="outputDevices">    
+            <div id="outputDevices" class="row col-md-4">   
             <!-- Output will be displayed here -->
             </div>
         </div>
     </div>
     <br>
-    <div class="card" id="pinContainer" style="width: 100%">
+    <div class="card" id="pinContainer">
         <div class="card-header">
             <h5 class="card-title">Pin Control</h5>
         </div>
@@ -62,7 +62,7 @@
             const card = document.createElement('div');
             card.classList.add('col-md-4', 'mb-4');
             card.innerHTML = `
-                <div class="card" id="${data.device_id}" onclick="getSingleDevice(${data.device_id})" style= "width: 25%">
+                <div class="card" id="${data.device_id}" onclick="getSingleDevice(${data.device_id})">
                     <div class="card-header">
                         <h5 class="card-title">${data.name}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">ID: ${data.device_id}</h6>
