@@ -8,12 +8,20 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1 class="my-4">RPI Board Control</h1>
-        <div id="output" class="row">
+    <h1 class="my-4">RPI Board Control</h1>
+    <div class="container" id="devicesContainer">
+        <h2 class="my-4">Devices</h2>
+        <div id="outputDevices" class="row">
             <!-- Output will be displayed here -->
         </div>
     </div>
+    <div class="container" id="pinContainer">
+        <h2 class="my-4">Pin Control</h2>
+        <div id="outputPin" class="row">
+            <!-- Output will be displayed here -->
+        </div>
+    </div>
+
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -24,6 +32,9 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             getDevices();
         });
+        document.addEventListener('DOMContentLoaded', (event) => {
+            getPin();
+        });
 
         function getDevices(){
             fetch('http://192.168.1.51:5000/rpi/device')
@@ -31,7 +42,7 @@
                 .then(data => {
                     data.forEach(device => {
                         const card = crearCartaComponente(device);
-                        document.getElementById('output').appendChild(card);
+                        document.getElementById('outputDevices').appendChild(card);
                         setInterval(() => readDevice(device.device_id), 5000);
                     });
                 })
@@ -91,6 +102,57 @@
                 .catch(error => console.error('Error fetching device data:', error));
         }
 
+        function getPin(){
+            fetch('http://192.168.1.51:5000/rpi/pin')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(pin => {
+                        const card = crearCartaPin(pin);
+                        document.getElementById('outputPin').appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function crearCartaPin(data){
+            const card = document.createElement('div');
+            card.classList.add('col-md-4', 'mb-4');
+            card.innerHTML = `
+                <div class="card" id="${data.pin_number}" onclick="getSinglePin(${data.pin_number})">
+                    <div class="card-header">
+                        <h5 class="card-title">Pin ${data.pin_number}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${data.name}</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Mode: ${data.mode}</p>
+                        <p class="card-text">State: ${data.state}</p>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function getSinglePin(pin_number){
+            fetch(`http://192.168.1.51:5000/rpi/pin/${pin_number}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    //Modificamos el DOM de la carta correspondiente
+                    actualizarCartaPin(data);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // 
+        function actualizarCartaPin(data){
+            const card = document.getElementById(data.pin_number);
+            card.children[1].innerHTML = '';
+            Object.keys(data).forEach(key => {
+                if(key !== 'pin_number' && key !== 'name'){
+                    card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
+                }
+            });
+        }
     </script>
 </body>
 </html>
