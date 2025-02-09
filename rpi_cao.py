@@ -1,5 +1,4 @@
 import RPi.GPIO as GPIO
-from config import LOGGER
 
 class GPIOControlCAO:
     """
@@ -18,7 +17,6 @@ class GPIOControlCAO:
             pull (str): Resistencia pull-up o pull-down (PULL_UP, PULL_DOWN o None).
             state (str): Estado inicial del pin (HIGH o LOW)."""
         if mode not in ("INPUT", "OUTPUT"):
-            LOGGER.error("El modo debe ser 'INPUT' o 'OUTPUT'.")
             return False
         try:
             gpio_mode = GPIO.IN if mode == "INPUT" else GPIO.OUT
@@ -39,7 +37,6 @@ class GPIOControlCAO:
 
             return True
         except Exception as e:
-            LOGGER.error("Error configurando pin %s: %s", pin_number, e)
             return False
 
     def write_pin(self, pin_number: int, state: str):
@@ -53,14 +50,12 @@ class GPIOControlCAO:
             bool: True si la operación fue exitosa, False en caso contrario.
         """
         if state not in ("HIGH", "LOW"):
-            LOGGER.error("El estado debe ser 'HIGH' o 'LOW'.")
             return False
         try:
             gpio_state = GPIO.HIGH if state == "HIGH" else GPIO.LOW
             GPIO.output(pin_number, gpio_state)
             return True
         except Exception as e:
-            LOGGER.error("Error escribiendo en pin %s: %s", pin_number, e)
             return False
 
     def read_pin(self, pin_number: int):
@@ -76,8 +71,9 @@ class GPIOControlCAO:
             state = GPIO.input(pin_number)
             return "HIGH" if state == GPIO.HIGH else "LOW"
         except Exception as e:
-            LOGGER.error("Error leyendo pin %s: %s", pin_number, e)
             return None
 
     def cleanup_all(self):
         GPIO.cleanup()
+
+GPIOCAO = GPIOControlCAO()

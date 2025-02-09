@@ -1,10 +1,24 @@
 """Main Blueprint, made for checking services"""
-from flask import jsonify, current_app
+from flask import jsonify, current_app, send_from_directory
 from flask_smorest import Blueprint
 from app.services.db import DBManager
 from config import LOGGER
+import os
 
 main_bp = Blueprint('checks', __name__)
+
+@main_bp.route('/', methods=['GET'])
+@main_bp.response(200, {"message": {"type": "string"}}, description="Successful response indicating the server is reachable.")
+def index():
+    """
+    Makes a ping request to the server to test basic connectivity.
+    """
+    LOGGER.warning("This the root")
+    if os.environ("RPI_MODULE"):
+        return send_from_directory(os.path.join(current_app.root_path, 'static'), 'index.html')
+    else:
+        return jsonify({"message": "Flask API"}), 404
+
 
 @main_bp.route('/ping', methods=['GET'])
 @main_bp.response(200, {"message": {"type": "string"}}, description="Successful response indicating the server is reachable.")
