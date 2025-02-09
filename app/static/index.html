@@ -150,22 +150,26 @@
                 .then(data => {
                     console.log(data);
                     //Modificamos el DOM de la carta correspondiente
-                    actualizarValorCartaPin(data);
+                    actualizarValorCartaPin(pin_number, data)
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        function actualizarValorCartaPin(pin_number, key, value){
-            const element = document.getElementById(`pin_${pin_number}_${key}`);
-            if(element == null){
-                const parentElement = document.getElementById('pin_' + pin_number);
-                let newElement = document.createElement('p');
-                newElement.classList.add('card-text');
-                newElement.innerHTML = `${key}: ${value}`;
-                parentElement.appendChild(newElement);
-            }else{
-                element.innerHTML = `${key}: ${value}`;
-            }
+        function actualizarValorCartaPin(pin_number, data){
+            Object.keys(data).forEach(key => {
+                if(key !== 'pin_number' && key !== 'name'){
+                    const element = document.getElementById(`pin_${pin_number}_${key}`);
+                    if(element == null){
+                        const parentElement = document.getElementById('pin_' + pin_number);
+                        let newElement = document.createElement('p');
+                        newElement.classList.add('card-text');
+                        newElement.innerHTML = `${key}: ${data[key]}`;
+                        parentElement.appendChild(newElement);
+                    }else{
+                        element.innerHTML = `${key}: ${data[key]}`;
+                    }
+                }
+            });
         }
 
         function sendPostRequest(pin_number, state) {
