@@ -129,16 +129,16 @@
                         <h6 class="card-subtitle mb-2 text-muted">${data.name}</h6>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Mode: ${data.mode}</p>
-                        <p class="card-text">State: ${data.state}</p>
             `;
             if(data.protocol == "GPIO" && data.mode == "OUTPUT"){
                 card.innerHTML += `
-                    <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
-                    <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
+                        <button type="button" class="btn btn-success" onclick="sendPostRequest(${data.pin_number}, 'HIGH')">ON</button>
+                        <button type="button" class="btn btn-danger" onclick="sendPostRequest(${data.pin_number}, 'LOW')">OFF</button>
                 `;
             }
             card.innerHTML += `
+                        <p class="card-text">Mode: ${data.mode}</p>
+                        <p class="card-text">State: ${data.state}</p>
                     </div>
                 </div>
             `;
@@ -159,7 +159,7 @@
         // 
         function actualizarCartaPin(data){
             const card = document.getElementById(`pin_${data.pin_number}`);
-            card.children[1].innerHTML = '';
+            card.children[2].innerHTML = '';
             let objKeys = Object.keys(data)
             objKeys.forEach(key => {
                 if(key == 'protocol' || key == 'pull'){
