@@ -14,7 +14,7 @@
             <h5 class="card-title">Devices</h5>
         </div>
         <div class="card-body">
-            <div id="outputDevices" class="row col-md-4">   
+            <div id="outputDevices" class="row">   
             <!-- Output will be displayed here -->
             </div>
         </div>
@@ -60,7 +60,7 @@
 
         function crearCartaComponente(data){
             const card = document.createElement('div');
-            card.classList.add('col-md-4', 'mb-4');
+            //card.classList.add('col-md-4', 'mb-4');
             card.innerHTML = `
                 <div class="card" id="${data.device_id}" onclick="getSingleDevice(${data.device_id})">
                     <div class="card-header">
