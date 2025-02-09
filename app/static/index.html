@@ -147,11 +147,29 @@
         function actualizarCartaPin(data){
             const card = document.getElementById(`pin_${data.pin_number}`);
             card.children[1].innerHTML = '';
-            Object.keys(data).forEach(key => {
+            let objKeys = Object.keys(data)
+            objKeys.forEach(key => {
                 if(key !== 'pin_number' && key !== 'name'){
-                    card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
+                    if(data["mode"] == "OUTPUT" && key == "state"){
+                        let estadoInicial;
+                        if(data["state"] == "LOW"){
+                            estadoInicial = "no"
+                        }else{
+                            estadoInicial = "yes"
+                        }
+                        //crear boton ON/OFF
+                        card.children[1].innerHTML += `
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="${data.pin_number}_buttonOnOff" name="buttonOnOff" value="${estadoInicial}" checked>
+                                <label class="form-check-label" for="${data.pin_number}_buttonOnOff">OFF/ON</label>
+                            </div>
+                        `;
+                    }else{
+                        card.children[1].innerHTML += `<p class="card-text">${key}: ${data[key]}</p>`;
+                    }
                 }
             });
+
         }
     </script>
 </body>
