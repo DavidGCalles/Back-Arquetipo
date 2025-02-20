@@ -6,8 +6,6 @@ from flask.views import MethodView
 from flask import jsonify
 from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import DeviceSchema
-from app.dao.rpi_dao import DeviceDAO
-from app.services.rpi_device_controller import DeviceController
 from config import LOGGER, Config
 import requests
 

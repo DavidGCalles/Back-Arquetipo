@@ -14,7 +14,7 @@ def index():
     Makes a ping request to the server to test basic connectivity.
     """
     LOGGER.warning("This the root")
-    if os.environ("RPI_MODULE"):
+    if os.environ.get("RPI_MODULE"):
         return send_from_directory(os.path.join(current_app.root_path, 'static'), 'index.html')
     else:
         return jsonify({"message": "Flask API"}), 404
