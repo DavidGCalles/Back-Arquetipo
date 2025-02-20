@@ -8,9 +8,9 @@ from flask_smorest import Api
 from flask_cors import CORS
 from app.routes.main import main_bp
 from app.routes.demo_crud import crud_bp
-from app.routes.rpi import rpi_bp
-from app.routes.rpi_pin import rpi_pin_bp
-from app.routes.rpi_device import rpi_device_bp
+from app.routes.middleware.rpi import rpi_bp
+from app.routes.middleware.rpi_pin import rpi_pin_bp
+from app.routes.middleware.rpi_device import rpi_device_bp
 from app.services.db import DBManager
 from config import Config
 

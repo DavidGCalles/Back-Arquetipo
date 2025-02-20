@@ -34,7 +34,6 @@ class Config:
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"
-    DDL_RPI_NAME = "models/ddl_rpi.sql"
     DDL_MYSQL_NAME = "models/ddl_rpi.sql"
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
@@ -43,6 +42,11 @@ class Config:
         "AUTH_URI" : 'https://accounts.google.com/o/oauth2/auth',
         "TOKEN_URI" : 'https://accounts.google.com/o/oauth2/token',
         "SCOPE" : ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/calendar']
+    }
+    RPI_MIDDLEWARE_SETTINGS = {
+        "DDL_RPI_NAME" : "models/ddl_rpi.sql",
+        "RPI_CONTROLLER_HOST": "localhost",
+        "RPI_CONTROLLER_PORT": "5001"
     }
 
 # Setup logger

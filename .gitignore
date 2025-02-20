@@ -2,6 +2,7 @@
 /app/__pycache__
 /app/dao/__pycache__
 /app/routes/__pycache__
+/app/routes/middleware/__pycache__
 /app/services/__pycache__
 /app/models/__pycache__
 /app/tests/__pycache__
@@ -11,3 +12,4 @@ rpi.db*
 .coverage
 coverage.lcov
 .vscode/
+app/routes/middleware/__pycache__/rpi.c*
