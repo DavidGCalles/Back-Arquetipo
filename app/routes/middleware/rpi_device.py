@@ -8,10 +8,15 @@ from app.models.demo_schemas import MessageResponseSchema
 from app.models.rpi_schemas import DeviceSchema
 from app.dao.rpi_dao import DeviceDAO
 from app.services.rpi_device_controller import DeviceController
-from config import LOGGER
+from config import LOGGER, Config
+import requests
 
 # Blueprint
 rpi_device_bp = Blueprint('rpi_device', __name__, description="Blueprint dedicated to Raspberry Pi Device operations.")
+
+rpi_host = Config.RPI_MIDDLEWARE_SETTINGS["RPI_CONTROLLER_HOST"]
+rpi_port = Config.RPI_MIDDLEWARE_SETTINGS["RPI_CONTROLLER_PORT"]
+base_url = f"http://{rpi_host}:{rpi_port}"
 
 @rpi_device_bp.route("/rpi/device")
 class DeviceCollection(MethodView):
@@ -25,9 +30,12 @@ class DeviceCollection(MethodView):
         GET method: Retrieve data for a specific device ID.
         """
         try:
-            return jsonify(DeviceDAO().get_all_devices()), 200
+            url = f"{base_url}/rpi/device/"
+            LOGGER.info("URL generated: %s", url)
+            result = requests.get(url=url, timeout=10)
+            return jsonify(result.json()), result.status_code
         except KeyError:
-            return jsonify({"error": "Device ID not initialized"}), 404
+            return jsonify({"error": "Device ID not initialized or host not reachable"}), 404
     @rpi_device_bp.arguments(DeviceSchema)
     @rpi_device_bp.response(201, MessageResponseSchema, description="New device successfully inserted.")
     @rpi_device_bp.doc(summary="Insert new device", description="Insert a new device into the database.")
@@ -35,9 +43,10 @@ class DeviceCollection(MethodView):
         """
         POST method: Insert data for a new device.
         """
-        request.pop("device_id", None)  # Remove device_id from request
-        result = DeviceDAO().insert_device(request)
-        if result:
+        url = f"{base_url}/rpi/device"
+        LOGGER.info("Request data: %s", request)
+        result = requests.post(url=url, json=request, timeout=10)
+        if result.status_code == 201:
             return {"message": "New device inserted"}, 201
         return {"message": "There was a problem inserting the device"}, 503
 
@@ -49,20 +58,22 @@ class DeviceCrud(MethodView):
         """
         GET method: Retrieve data for a specific device ID.
         """
-        try:
-            return jsonify(DeviceDAO().get_device(device_id)), 200
-        except KeyError:
-            return jsonify({"error": "Device ID not initialized"}), 404
+        url = f"{base_url}/rpi/device/{device_id}"
+        LOGGER.info("URL generated: %s", url)
+        result = requests.get(url=url, timeout=10)
+        return jsonify(result.json()), result.status_code
+    
     @rpi_device_bp.response(200, MessageResponseSchema, description="Device data successfully deleted.")
     @rpi_device_bp.doc(summary="Delete device data", description="Delete data for a specific device ID.")
     def delete(self, device_id):
         """
         DELETE method: Delete data for a specific device ID.
         """
-        result = DeviceDAO().delete_device(device_id)
-        if result:
-            return {"message": "Device successfully deleted"}, 200
-        return {"message": "Device not found"}, 404
+        url = f"{base_url}/rpi/device/{device_id}"
+        LOGGER.info("URL generated: %s", url)
+        result = requests.delete(url=url, timeout=10)
+        return jsonify(result.json()), result.status_code
+        
     @rpi_device_bp.arguments(DeviceSchema)
     @rpi_device_bp.response(200, MessageResponseSchema, description="Device data successfully updated.")
     @rpi_device_bp.doc(summary="Update device data", description="Update data for a specific device ID.")
@@ -70,11 +81,10 @@ class DeviceCrud(MethodView):
         """
         PATCH method: Update data for a specific device ID.
         """
-        request.pop("device_id", None)
-        result = DeviceDAO().update_device(device_id, request)
-        if result:
-            return {"success": True}, 200
-        return {"message": "Device not found"}, 404
+        url = f"{base_url}/rpi/device/{device_id}"
+        LOGGER.info("Request data: %s", request)
+        result = requests.patch(url=url, json=request, timeout=10)
+        return jsonify(result.json()), result.status_code
 
 @rpi_device_bp.route("/rpi/device/<int:device_id>/read")
 class DeviceRead(MethodView):
@@ -85,16 +95,8 @@ class DeviceRead(MethodView):
         """
         GET method: Read data for a specific device ID.
         """
-        try:
-            device = DeviceDAO().get_device(device_id)
-            if device:
-                controller = DeviceController(device)
-                value = controller.read_device()
-                DeviceDAO().update_device(device_id, {"value": value})
-                return jsonify(value), 200
-            else:
-                raise KeyError("Device not found")
-        except KeyError as e:
-            return jsonify({"message": "Device not found", "detail":e}), 404
-        except NameError as e:
-            return jsonify({"message": "Device not found", "detail": e}), 404
+        url = f"{base_url}/rpi/device/{device_id}/read"
+        LOGGER.info("URL generated: %s", url)
+        result = requests.get(url=url, timeout=10)
+        return jsonify(result.json()), result.status_code
+    
