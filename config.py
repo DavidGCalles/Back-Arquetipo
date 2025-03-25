@@ -31,6 +31,13 @@ class Config:
             "DB_NAME": 'your_database_name',
             "DB_USER": 'root',
             "DB_PASSWORD": 'toor'
+        },
+        "cloud-sql": {
+            "DB_HOST": 'your_db_host',
+            "DB_PORT": '3306',
+            "DB_NAME": 'your_database_name',
+            "DB_USER": 'your_db_user',
+            "DB_PASSWORD": 'your_dbpass'
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"
