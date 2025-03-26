@@ -5,6 +5,7 @@ import os
 import sqlite3
 import mysql.connector
 from mysql.connector import Error
+from app.services.google_cloud import GCPSecretManager
 from config import Config, LOGGER
 
 class DBManager:
@@ -46,7 +47,7 @@ class DBManager:
             except Exception as e:
                 LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
                 return False
-        elif self.db_type in ["mysql", "mysql-docker"]:
+        elif self.db_type in ["mysql", "mysql-docker","cloud-sql-local"]:
             try:
                 conn = self.get_db_connection()
                 cur = conn.cursor()
@@ -63,6 +64,7 @@ class DBManager:
             except Exception as e:
                 LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
                 return False
+        return True
 
     def reset_db_settings(self, new_db_type:str):
         self.db_type = new_db_type
@@ -93,6 +95,22 @@ class DBManager:
                     database=self.db_settings["DB_NAME"],
                     user=self.db_settings["DB_USER"],
                     password=self.db_settings["DB_PASSWORD"],
+                    charset='utf8mb4',  # Explicitly set charset
+                    collation='utf8mb4_general_ci'  # Explicitly set collation
+                )
+                return connection
+            except Error as e:
+                LOGGER.error("Error connecting to MySQL: %s",e)
+                return None
+        elif self.db_type == "cloud-sql-local":
+            try:
+                secret_manager = GCPSecretManager()
+                connection = mysql.connector.connect(
+                    host=self.db_settings["DB_HOST"],
+                    port=self.db_settings["DB_PORT"],
+                    database=self.db_settings["DB_NAME"],
+                    user=self.db_settings["DB_USER"],
+                    password=secret_manager.get_secret(Config.GCP_SETTINGS["DB_ROOT_SECRET_ID"]),
                     charset='utf8mb4',  # Explicitly set charset
                     collation='utf8mb4_general_ci'  # Explicitly set collation
                 )

@@ -32,16 +32,21 @@ class Config:
             "DB_USER": 'root',
             "DB_PASSWORD": 'toor'
         },
-        "cloud-sql": {
-            "DB_HOST": 'your_db_host',
+        "cloud-sql-local": {
+            "DB_HOST": '127.0.0.1',
             "DB_PORT": '3306',
             "DB_NAME": 'your_database_name',
-            "DB_USER": 'your_db_user',
+            "DB_USER": 'root',
             "DB_PASSWORD": 'your_dbpass'
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"
-    DDL_MYSQL_NAME = "models/ddl_rpi.sql"
+    DDL_MYSQL_NAME = "models/ddl_mysql.sql"
+    GCP_SETTINGS = {
+        "PROJECT_ID": os.getenv("PROJECT_ID","micros-436921"),
+        "PROJECT_NUMBER": os.getenv("PROJECT_NUMBER","856517455627"),
+        "DB_ROOT_SECRET_ID": os.getenv("DB_ROOT_SECRET_ID", "main-dev-db-root")
+    }
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,
