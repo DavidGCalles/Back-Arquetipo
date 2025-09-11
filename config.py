@@ -34,7 +34,7 @@ class Config:
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"
-    DDL_MYSQL_NAME = "models/ddl_rpi.sql"
+    DDL_MYSQL_NAME = "models/ddl_mysql.sql"
     GOOGLE_OAUTH = {
         "GOOGLE_CLIENT_ID" : "",#GOOGLE_CLIENT_ID,
         "GOOGLE_CLIENT_SECRET" :"",# GOOGLE_CLIENT_SECRET,

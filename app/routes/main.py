@@ -11,13 +11,13 @@ main_bp = Blueprint('checks', __name__)
 @main_bp.response(200, {"message": {"type": "string"}}, description="Successful response indicating the server is reachable.")
 def index():
     """
-    Makes a ping request to the server to test basic connectivity.
+    Serves static index in case of RPI module, 404 otherwise.
     """
     LOGGER.warning("This the root")
     if os.environ.get("RPI_MODULE"):
         return send_from_directory(os.path.join(current_app.root_path, 'static'), 'index.html')
     else:
-        return jsonify({"message": "Flask API"}), 404
+        return jsonify({"message": "Flask API - RPI module not enabled"}), 404
 
 
 @main_bp.route('/ping', methods=['GET'])
