@@ -17,13 +17,16 @@ def test_create_app():
 def test_blueprints_registered():
     app = create_app()
     assert 'checks' in app.blueprints
-    assert 'crud' in app.blueprints
+    assert 'mysql_crud' in app.blueprints
+    assert 'sqlite_crud' in app.blueprints
+
 
 @patch.dict(os.environ, {"RPI_MODULE": "1"})
 def test_blueprints_registered_with_rpi_module():
     app = create_app()
     assert 'checks' in app.blueprints
-    assert 'crud' in app.blueprints
+    assert 'mysql_crud' in app.blueprints
+    assert 'sqlite_crud' in app.blueprints
     assert 'rpi' in app.blueprints
 
 @patch.dict(os.environ, {"SWAGGER_HOST": "https://example.com"})

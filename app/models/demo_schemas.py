@@ -12,6 +12,13 @@ class ItemSchema(BaseSchema):
     name = fields.Str(required=True, metadata={"description": "Name of the item"})
     description = fields.Str(required=False, metadata={"description": "Description of the item"})
 
+class CreateItemSchema(BaseSchema):
+    """
+    CreateItemSchema: Class to manage the schema of the items to create.
+    """
+    name = fields.Str(required=True, metadata={"description": "Name of the item"})
+    description = fields.Str(required=False, metadata={"description": "Description of the item"})
+
 class UpdateItemSchema(BaseSchema):
     """
     UpdateItemSchema: Class to manage the schema of the items to update.

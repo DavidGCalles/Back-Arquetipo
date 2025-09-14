@@ -10,10 +10,10 @@ def client():
         yield client
 
 def test_get_all_items(client, mocker):
-    mocker.patch('app.dao.generic_dao.BaseDAO.generic_get_all', return_value=[{"id": 1, "name": "Item 1"}])
+    mocker.patch('app.dao.generic_dao.BaseDAO.generic_get_all', return_value=[(1, "Item 1", "Description 1")])
     response = client.get('/demo_crud')
     assert response.status_code == 200
-    assert response.json == [{"id": 1, "name": "Item 1"}]
+    assert response.json == [{"id": 1, "name": "Item 1", "description": "Description 1"}]
 
 def test_insert_item(client, mocker):
     mocker.patch('app.dao.generic_dao.BaseDAO.generic_insert', return_value=True)
@@ -22,10 +22,10 @@ def test_insert_item(client, mocker):
     assert response.json == {"message": "New item inserted"}
 
 def test_get_item_by_id(client, mocker):
-    mocker.patch('app.dao.generic_dao.BaseDAO.generic_get_by_field', return_value={"id": 1, "name": "Item 1"})
+    mocker.patch('app.dao.generic_dao.BaseDAO.generic_get_by_field', return_value=(1, "Item 1", "Description 1"))
     response = client.get('/demo_crud/item/1')
     assert response.status_code == 200
-    assert response.json == {"id": 1, "name": "Item 1"}
+    assert response.json == {"id": 1, "name": "Item 1", "description": "Description 1"}
 
 def test_update_item(client, mocker):
     mocker.patch('app.dao.generic_dao.BaseDAO.generic_update', return_value=True)

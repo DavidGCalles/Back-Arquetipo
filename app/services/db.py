@@ -9,97 +9,41 @@ from config import Config, LOGGER
 
 class DBManager:
     def __init__(self):
-        self.db_type = os.getenv("DATABASE_TYPE", "sqlite")
-        self.db_settings = Config.DB_TYPES[self.db_type]
+        self.db_configs = Config.DATABASE_CONFIGURATIONS
         self.project_root = Path(__file__).resolve().parent.parent
-    def check_coherence(self):
-        LOGGER.info("Chequeando la coherencia de la base de datos %s", self.db_type)
-        if self.db_type == "sqlite":
-            try:
-                conn = self.get_db_connection()
-                cur = conn.cursor()
-                ddl_path = self.project_root / Config.DDL_NAME
-                LOGGER.info("Cargando ddl")
-                with open(ddl_path, 'r', encoding="UTF-8") as file:
-                    sql_script = file.read()
-                cur.executescript(sql_script)
-                conn.commit()
-                conn.close()
-                LOGGER.info("Comprobación terminada")
-                return True
-            except Exception as e:
-                LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
-                return False
-        elif self.db_type == "sqlite-rpi":
-            try:
-                conn = self.get_db_connection()
-                cur = conn.cursor()
-                ddl_path = self.project_root / Config.RPI_MIDDLEWARE_SETTINGS["DDL_RPI_NAME"]
-                LOGGER.info("Cargando ddl-rpi")
-                with open(ddl_path, 'r', encoding="UTF-8") as file:
-                    sql_script = file.read()
-                cur.executescript(sql_script)
-                conn.commit()
-                conn.close()
-                LOGGER.info("Comprobación terminada")
-                return True
-            except Exception as e:
-                LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
-                return False
-        elif self.db_type in ["mysql", "mysql-docker"]:
-            try:
-                conn = self.get_db_connection()
-                cur = conn.cursor()
-                ddl_path = self.project_root / Config.DDL_MYSQL_NAME
-                LOGGER.info("Cargando ddl")
-                with open(ddl_path, 'r', encoding="UTF-8") as file:
-                    sql_script = file.read()
-                for result in cur.execute(sql_script, multi=True):
-                    pass
-                conn.commit()
-                conn.close()
-                LOGGER.info("Comprobación terminada")
-                return True
-            except Exception as e:
-                LOGGER.error("Ha habido algun problema con la coherencia de la base de datos: %s",e)
-                return False
 
-    def reset_db_settings(self, new_db_type:str):
-        self.db_type = new_db_type
-        self.db_settings = Config.DB_TYPES[self.db_type]
-
-    def get_db_connection(self):
+    def get_db_connection(self, db_name: str):
         """Creates and return a db connection with the parameters given in config class"""
-        LOGGER.debug("Conectando a la base de datos %s", self.db_type)
-        if self.db_type == "sqlite":
+        if db_name not in self.db_configs:
+            LOGGER.error("Database configuration '%s' not found.", db_name)
+            return None
+
+        db_settings = self.db_configs[db_name]
+        db_type = "sqlite" if "sqlite" in db_name else "mysql" if "mysql" in db_name else None
+
+        LOGGER.debug("Conectando a la base de datos %s", db_name)
+        if db_type == "sqlite":
             try:
-                connection = sqlite3.connect(self.db_settings["DB_HOST"])
+                connection = sqlite3.connect(db_settings["DB_HOST"])
                 return connection
             except Error as e:
-                LOGGER.error("Error connecting to SQLite3: %s",e)
+                LOGGER.error("Error connecting to SQLite3 (%s): %s", db_name, e)
                 return None
-        elif self.db_type == "sqlite-rpi":
-            try:
-                connection = sqlite3.connect(self.db_settings["DB_HOST"])
-                return connection
-            except Error as e:
-                LOGGER.error("Error connecting to SQLite3 for RPI control: %s",e)
-                return None
-        elif self.db_type in ["mysql","mysql-docker"]:
+        elif db_type == "mysql":
             try:
                 connection = mysql.connector.connect(
-                    host=self.db_settings["DB_HOST"],
-                    port=self.db_settings["DB_PORT"],
-                    database=self.db_settings["DB_NAME"],
-                    user=self.db_settings["DB_USER"],
-                    password=self.db_settings["DB_PASSWORD"],
+                    host=db_settings["DB_HOST"],
+                    port=db_settings["DB_PORT"],
+                    database=db_settings["DB_NAME"],
+                    user=db_settings["DB_USER"],
+                    password=db_settings["DB_PASSWORD"],
                     charset='utf8mb4',  # Explicitly set charset
                     collation='utf8mb4_general_ci'  # Explicitly set collation
                 )
                 return connection
             except Error as e:
-                LOGGER.error("Error connecting to MySQL: %s",e)
+                LOGGER.error("Error connecting to MySQL (%s): %s", db_name, e)
                 return None
         else:
-            LOGGER.error("Database type %s not supported.", self.db_type)
+            LOGGER.error("Database type for '%s' not supported.", db_name)
             return None

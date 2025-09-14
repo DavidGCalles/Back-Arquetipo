@@ -10,14 +10,21 @@ class BaseDAO:
         table (str): The name of the database table this DAO is associated with.
         connection: The database connection object.
     """
-    def __init__(self):
+    def __init__(self, db_name: str = "sqlite", connection=None):
         """
         Initializes the BaseDAO with a specific table name and database connection.
         """
         self.table = "item"
-        self.placeholder = "?" if "sqlite" in DBManager().db_type else "%s"
+        self.db_name = db_name
+        self.placeholder = "?" if "sqlite" in self.db_name else "%s"
         self.db_manager = DBManager()
-        self.connection = None
+        self.connection = connection
+    
+    def get_connection(self):
+        if self.connection:
+            return self.connection
+        return self.db_manager.get_db_connection(self.db_name)
+
     def generic_get_all(self):
         """
         Fetches all records from the database table.
@@ -25,15 +32,16 @@ class BaseDAO:
         Returns:
             list: A list of tuples representing each record fetched from the table.
         """
-        self.connection = self.db_manager.get_db_connection()
+        connection = self.get_connection()
         query = f"SELECT * FROM {self.table}"
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(query)
             data = cursor.fetchall()
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
         return data
    
     def generic_get_by_field(self, field:str, value, like:bool=False):
@@ -49,16 +57,17 @@ class BaseDAO:
         Returns:
         - tuple: A tuple representing the record fetched from the table.
         """
-        self.connection = self.db_manager.get_db_connection()
+        connection = self.get_connection()
         operator = "LIKE" if like else "="
         query = f"SELECT * FROM {self.table} WHERE {field} {operator} {self.placeholder}"
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(query, (value,))
             data = cursor.fetchone()
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
         return data
 
     def generic_search(self, search_data: dict, like: bool = False):
@@ -73,7 +82,7 @@ class BaseDAO:
         Returns:
         - list: A list of tuples representing the records fetched from the table.
         """
-        self.connection =self.db_manager.get_db_connection()
+        connection = self.get_connection()
         
         # Build the conditions for the query
         conditions = []
@@ -95,30 +104,29 @@ class BaseDAO:
         LOGGER.debug(query)  # Log the query for debugging
         
         # Execute the query
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(query, tuple(search_data.values()))  # Pass the updated search_data
             data = cursor.fetchall()
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
         
         return data
-
 
     def generic_insert(self, insert_data: dict, ignore_flag: bool = False):
         """
         Inserts a new record into the database table.
-
-        Args:
-            insert_data (dict): A dictionary containing column-value pairs to be inserted.
-
-        Returns:
-            int: The auto-generated ID of the newly inserted record.
+            insert_data (dict): A dictionary containing column-value pairs for the new record.
+            ignore_flag (bool, optional): If True, uses 'INSERT OR IGNORE' to prevent
+                errors on duplicate unique keys. Defaults to False.
+            int | None: The auto-generated ID of the newly inserted record on success,
+                or None if an error occurs.
         """
 
         # Extract keys and values from insert_data
-        self.connection = self.db_manager.get_db_connection()
+        connection = self.get_connection()
         keys = ", ".join(insert_data.keys())
         placeholders = ", ".join([self.placeholder] * len(insert_data))  # Use the appropriate placeholder
 
@@ -129,21 +137,22 @@ class BaseDAO:
         values = tuple(insert_data.values())
 
         # Create cursor, execute the query, and commit the changes
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(query, values)  # Execute with values tuple to safely pass data
-            self.connection.commit()
+            connection.commit()
             new_id = cursor.lastrowid  # Retrieves the last inserted ID
         except Exception as e:
             LOGGER.error("Error inserting data: %s", e)
             new_id = None
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
 
         return new_id  # Return the autogenerated ID
 
-    def generic_update(self, pk:str, update_data:dict, immutable_keys:list = None):
+    def generic_update(self, pk:str, pk_value, update_data:dict, immutable_keys:list = None):
         """
         Update a record in the database with new data provided in the update_data dictionary.
 
@@ -153,6 +162,7 @@ class BaseDAO:
 
         Parameters:
         - pk (str): The key in the update_data dictionary that holds the primary key of the record.
+        - pk_value: The value of the primary key.
         - update_data (dict): A dictionary containing the fields to update with their new values. 
                             The dictionary must contain the primary key as one of its keys.
 
@@ -165,21 +175,21 @@ class BaseDAO:
             return 0
         if immutable_keys and self.check_for_immutable_keys(update_data, immutable_keys) not in [None, pk]:
             raise ValueError(f"Immutable keys cannot be modified: {immutable_keys}")
-        self.connection = self.db_manager.get_db_connection()
-        primary_key = update_data.pop(pk)
+        connection = self.get_connection()
         keys = ", ".join([f"{key} = {self.placeholder}" for key in update_data.keys()])
         values = list(update_data.values())
-        values.append(primary_key)  # Append the primary key to values to use in the WHERE clause
+        values.append(pk_value)  # Append the primary key to values to use in the WHERE clause
         sql = f"UPDATE {self.table} SET {keys} WHERE {pk} = {self.placeholder}"
         LOGGER.debug(sql)
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(sql, values)
-            self.connection.commit()
+            connection.commit()
             rowcount = cursor.rowcount
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
 
         return rowcount  # Return the number of rows affected
 
@@ -202,20 +212,21 @@ class BaseDAO:
         Raises:
         - KeyError: If the primary key is not found in the replace_data dictionary.
         """
-        self.connection = self.db_manager.get_db_connection()
+        connection = self.get_connection()
         keys = ", ".join(replace_data.keys())
         placeholders = ", ".join([self.placeholder] * len(replace_data.keys()))
         values = list(replace_data.values())
         sql = f"REPLACE INTO {self.table} ({keys}) VALUES ({placeholders})"
         LOGGER.debug(sql)
-        cursor = self.connection.cursor()
+        cursor = connection.cursor()
         try:
             cursor.execute(sql, values)
-            self.connection.commit()
+            connection.commit()
             rowcount = cursor.rowcount
         finally:
             cursor.close()
-            self.connection.close()
+            if not self.connection:
+                connection.close()
         return rowcount
 
     def generic_delete(self, pk:str, id_to_delete):
@@ -242,27 +253,29 @@ class BaseDAO:
         - Exception: If the SQL execution fails or if there are issues with the database connection.
         """
         success = False
+        connection = self.get_connection()
         try:
-            self.connection = self.db_manager.get_db_connection()
             query = f"DELETE FROM {self.table} WHERE {pk} = {self.placeholder}"
-            cursor = self.connection.cursor()
+            cursor = connection.cursor()
             try:
                 cursor.execute(query, (id_to_delete,))
-                self.connection.commit()
+                connection.commit()
                 success = True
             finally:
                 cursor.close()
-                self.connection.close()
+                if not self.connection:
+                    connection.close()
         except Exception as e:
             LOGGER.error("Error deleting record: %s", e)
             success = False
         return success
 
     def delete_all(self):
-        self.connection = self.db_manager.get_db_connection()
-        self.connection.execute(f"DELETE FROM {self.table};")
-        self.connection.commit()
-        self.connection.close()
+        connection = self.get_connection()
+        connection.execute(f"DELETE FROM {self.table};")
+        connection.commit()
+        if not self.connection:
+            connection.close()
     
     def check_for_immutable_keys(self, data: dict, immutable_keys: list):
         """
@@ -273,7 +286,7 @@ class BaseDAO:
         - immutable_keys (list): A list of keys that should not be modified.
 
         Returns:
-        - str: The immutable key found in the data, or None if no immutable keys are present.
+        - str: The first immutable key found in the data, or None if no immutable keys are present.
         """
         for key in immutable_keys:
             if key in data:

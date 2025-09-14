@@ -77,11 +77,12 @@ This will create the cloud build trigger and the cloud run function as service.
 ## List of ENV variables used in the app
 1. SWAGGER_HOST: This variable needs to be present when deploying beyond local because if not, not even the basic acces tests wont work. This variable is used inside app/_ _ init _ _.py. This will select the correct host depending on the deployment type.
 
-2. DATABASE_TYPE: This variable determines what set of variables your instance will get to connect to the database. It defaults to "sqlite". Docker compose sets it up to the db container.
+2. FLASK_ENV: This allows the app to know what origins have to allow
 
-3. FLASK_ENV: This allows the app to know what origins have to allow
+3. RPI_MODULE: In this moment, setting up this variable loads RPI blueprint for control. Value? Whatever you want, its not used
 
-4. RPI_MODULE: In this moment, setting up this variable loads RPI blueprint for control. Value? Whatever you want, its not used
+## Database Configuration
+The database connections are configured in the DATABASE_CONFIGURATIONS dictionary in config.py. Each key in the dictionary represents a database connection, and the value is a dictionary of connection parameters.
 
 ## Testing
 Execute this commands in the root folder.

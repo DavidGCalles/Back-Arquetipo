@@ -11,7 +11,7 @@ class Config:
         'title': 'Flask API',
         'uiversion': 3
     }
-    DB_TYPES = {
+    DATABASE_CONFIGURATIONS = {
         "sqlite": {
             "DB_HOST" : "inmemory.db"
         },

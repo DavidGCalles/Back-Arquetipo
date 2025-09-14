@@ -7,8 +7,6 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
-    environment:
-      - DATABASE_TYPE=mysql-docker
     depends_on:
       - db
 

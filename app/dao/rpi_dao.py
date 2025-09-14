@@ -4,8 +4,7 @@ from config import LOGGER
 
 class GPIOControlDAO(BaseDAO):
     def __init__(self):
-        super().__init__()
-        self.db_manager.reset_db_settings("sqlite-rpi")
+        super().__init__("sqlite-rpi")
         self.table = "gpio_pins"
 
     def insert_or_ignore(self, data: dict):
@@ -65,8 +64,7 @@ class GPIOControlDAO(BaseDAO):
 
 class DeviceDAO(BaseDAO):
     def __init__(self):
-        super().__init__()
-        self.db_manager.reset_db_settings("sqlite-rpi")
+        super().__init__("sqlite-rpi")
         self.table = "devices"
 
     def insert_device(self, device_info: dict):
