@@ -24,13 +24,6 @@ class Config:
             "DB_NAME": 'your_database_name',
             "DB_USER": 'root',
             "DB_PASSWORD": 'toor'
-        },
-        "mysql": {
-            "DB_HOST": 'localhost',
-            "DB_PORT": '3306',
-            "DB_NAME": 'your_database_name',
-            "DB_USER": 'root',
-            "DB_PASSWORD": 'toor'
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"

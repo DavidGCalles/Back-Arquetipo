@@ -6,7 +6,7 @@ import os
 from flask import Flask
 from flask_smorest import Api
 from flask_cors import CORS
-from app.routes.main import main_bp
+from app.routes.main import admin_bp
 from app.routes.demo_crud import sqlite_crud_bp, mysql_crud_bp
 from app.routes.middleware.rpi import rpi_bp
 from app.routes.middleware.rpi_pin import rpi_pin_bp
@@ -39,7 +39,7 @@ def create_app():
          supports_credentials=True)
     api = Api(app)
 
-    api.register_blueprint(main_bp)
+    api.register_blueprint(admin_bp)
     api.register_blueprint(sqlite_crud_bp)
     api.register_blueprint(mysql_crud_bp)
     if os.getenv("RPI_MODULE"):

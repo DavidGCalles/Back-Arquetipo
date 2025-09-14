@@ -12,6 +12,50 @@ class DBManager:
         self.db_configs = Config.DATABASE_CONFIGURATIONS
         self.project_root = Path(__file__).resolve().parent.parent
 
+    def initialize_database(self, db_name: str):
+        """Reads the DDL file and executes it for the specified database."""
+        LOGGER.info("Initializing database: %s", db_name)
+        
+        connection = self.get_db_connection(db_name)
+        if not connection:
+            LOGGER.error("Could not establish connection for %s. Aborting initialization.", db_name)
+            return False
+
+        try:
+            cursor = connection.cursor()
+            ddl_path = None
+            
+            if "sqlite" in db_name:
+                ddl_path = self.project_root / Config.DDL_NAME
+                with open(ddl_path, 'r', encoding="UTF-8") as file:
+                    sql_script = file.read()
+                cursor.executescript(sql_script)
+            
+            elif "mysql" in db_name:
+                ddl_path = self.project_root / Config.DDL_MYSQL_NAME
+                with open(ddl_path, 'r', encoding="UTF-8") as file:
+                    sql_script = file.read()
+                # Split script into individual statements to execute
+                for statement in sql_script.split(';'):
+                    if statement.strip():
+                        cursor.execute(statement)
+            
+            else:
+                LOGGER.warning("No DDL script found for database type of %s.", db_name)
+                return False
+
+            connection.commit()
+            LOGGER.info("Database %s initialized successfully.", db_name)
+            return True
+
+        except Error as e:
+            LOGGER.error("An error occurred during database initialization for %s: %s", db_name, e)
+            return False
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+
     def get_db_connection(self, db_name: str):
         """Creates and return a db connection with the parameters given in config class"""
         if db_name not in self.db_configs:

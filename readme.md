@@ -84,6 +84,13 @@ This will create the cloud build trigger and the cloud run function as service.
 ## Database Configuration
 The database connections are configured in the DATABASE_CONFIGURATIONS dictionary in config.py. Each key in the dictionary represents a database connection, and the value is a dictionary of connection parameters.
 
+## Database Initialization
+To support multiple database backends, the application no longer initializes databases automatically on startup. Instead, a dedicated endpoint is provided to create the necessary tables from the DDL scripts.
+
+    POST /init-db
+    
+This endpoint will initialize all databases defined in the DATABASE_CONFIGURATIONS dictionary in config.py.
+
 ## Testing
 Execute this commands in the root folder.
 If you have problems with importing modules, try:
