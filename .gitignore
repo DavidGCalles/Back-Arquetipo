@@ -14,3 +14,4 @@ coverage.lcov
 .vscode/
 app/routes/middleware/__pycache__/rpi.c*
 app/routes/middleware/__pycache__/rpi_pin.c*
+app/services/nosql/__pycache__/*

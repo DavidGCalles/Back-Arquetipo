@@ -24,6 +24,12 @@ class Config:
             "DB_NAME": 'your_database_name',
             "DB_USER": 'root',
             "DB_PASSWORD": 'toor'
+        },
+        "influxdb": {
+            "INFLUX_URL": "http://influxdb:8086",
+            "INFLUX_TOKEN": "my-super-secret-token",
+            "INFLUX_ORG": "my-org",
+            "INFLUX_BUCKET": "my-bucket"
         }
     }
     DDL_NAME = "models/ddl_sqlite.sql"

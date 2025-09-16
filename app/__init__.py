@@ -11,6 +11,7 @@ from app.routes.demo_crud import sqlite_crud_bp, mysql_crud_bp
 from app.routes.middleware.rpi import rpi_bp
 from app.routes.middleware.rpi_pin import rpi_pin_bp
 from app.routes.middleware.rpi_device import rpi_device_bp
+from app.routes.influx_crud import influx_crud_bp
 from app.services.db import DBManager
 from config import Config
 
@@ -42,6 +43,7 @@ def create_app():
     api.register_blueprint(admin_bp)
     api.register_blueprint(sqlite_crud_bp)
     api.register_blueprint(mysql_crud_bp)
+    api.register_blueprint(influx_crud_bp)
     if os.getenv("RPI_MODULE"):
         api.register_blueprint(rpi_bp)
         api.register_blueprint(rpi_pin_bp)
