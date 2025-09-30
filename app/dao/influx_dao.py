@@ -36,19 +36,28 @@ class InfluxDAO:
             if self.service:
                 self.service.close()
 
-    def query(self, query, bucket=None):
+    def query(self, bucket, measurement, start_range, stop_range=None):
         """
-        Queries data from InfluxDB.
+        Queries data from InfluxDB with specific filters.
         Args:
-            query (str): The Flux query to execute.
-            bucket (str, optional): The name of the bucket.
+            bucket (str): The name of the bucket.
+            measurement (str): The measurement to query.
+            start_range (str): The start of the time range.
+            stop_range (str, optional): The end of the time range.
         Returns:
             list: A list of query results, or None if an error occurs.
         """
         if not self.service:
             return None
+        
         try:
-            tables = self.service.query_data(query, bucket)
+            # Construct the Flux query dynamically
+            query = f'from(bucket:"{bucket}") |> range(start: {start_range}'
+            if stop_range:
+                query += f', stop: {stop_range}'
+            query += f') |> filter(fn: (r) => r._measurement == "{measurement}")'
+
+            tables = self.service.query_data(query)
             results = []
             for table in tables:
                 for record in table.records:
